@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-PUBDIR=${PUBDIR:-"../swoc-publish"}
+PUBDIR=${PUBDIR:-"../apache-publish"}
 if [ -z "${SRCDIR}" ] ; then SRCDIR="$PWD"; fi
 
 if cd ${PUBDIR} ; then
@@ -12,5 +12,7 @@ fi
 
 rm -rf *
 cp -r ${SRCDIR}/docbuild/html/* .
+cp -r ${SRCDIR}/docbuild/html/.nojekyll .
+cp -r ${SRCDIR}/docbuild/html/.buildinfo .
 git add *
 git commit --message "Update" && git push
