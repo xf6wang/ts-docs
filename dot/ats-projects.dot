@@ -1,0 +1,32 @@
+digraph {
+
+  subgraph {
+    l7r_project [shape=folder];
+    hostdb_project [shape=folder];
+    request_resolver_project [shape=folder];
+
+    l7r_project -> {hostdb_project request_resolver_project};
+  }
+
+  subgraph {
+    lua_config_project [shape=folder];
+    lua_tree_extractor [shape=rect style=rounded];
+    ts_lua_config [shape=rect style=rounded];
+
+    lua_config_project -> { lua_tree_extractor ts_lua_config};
+  }
+
+  subgraph {
+    RPC_refactor [shape=folder];
+    RPC_library [shape=rect style=rounded];
+    RPC_manager_no_delay [shape=rect style=rounded];
+    RPC_bidirectional [shape=rect style=rounded];
+    RPC_plugin [shape=rect style=rounded];
+
+    RPC_refactor -> {RPC_library RPC_manager_no_delay RPC_bidirectional RPC_plugin};
+    RPC_library -> RPC_manager_no_delay;
+    RPC_library -> RPC_bidirectional;
+    RPC_bidirectional -> RPC_plugin
+  }
+
+}
