@@ -15,6 +15,7 @@ Diagram.
    buffer-writer.en
    tsconfig-lua.en
    cache-tool.en
+   testing.en
    errata.en
 
 Layer 7 Routing
@@ -94,42 +95,6 @@ The current RPC mechanism used to communicate between command line tools and :co
 *  Make the RPC symmetric / bidirectional.
 
 As a side project, there is currently a roughly 5 second delay in communications for no apparent reason. As best as I can tell it is a deliberate pause to avoid :code:`epoll`. This should be fixed.
-
-Testing
-=======
-
-Pure Replay testing
-+++++++++++++++++++
-
-It should be possible to have run tests using only a replay file and potentially some configuration information, without any Python code at all. This requires the micro-DNS server.
-
-Header Comparators
-++++++++++++++++++
-
-Frequently the literalness of the gold testing is a problem. AUTest should have comparators that are specialized for HTTP headers. This could be worked in to the replay file format with metadata indicating which headers should be literal, vs. present/absent vs. irrelevant. Replay file based testing would greatly benefit from this.
-
-Traffic Capture / Sampling
-++++++++++++++++++++++++++
-
-At one point the technology existed to capture traffic for traffic replay. This should be resurrected and improved. After discussion among the group it seems that for replay purposes literal content is unnecessary, only the size matters. It is still debated if full capture is useful for debugging purposes. My opinion is it is not and complicates the capture process unnecessarily.
-
-We have an ask from another team for monitoring based roughly on this technology. A third party box would be placed in a data center and an ATS instance would proxy its outbound connections and produce records of its transactions. The outbound connections would be of two types.
-
-*  HTTPS connection which are presumed small and API based, at a rate of 1/second or less. These would be monitored in their entirety.
-*  HTTP connections which are presumed rare and essential downloads of new packages. Only headers and content size would be recorded for these.
-
-I think in terms of building out the replay tooling, making a plugin to do this is a good start. The plugin should record
-
-*  Each transaction
-*  The four headers
-*  The protocol stack for the user agent.
-*  The association between transactions and sessions.
-*  Sampling should be session based.
-
-Production Verification
-+++++++++++++++++++++++
-
-It would be nice to be able to run AUTest against live production systems to verify behavior, particularly with regard to paranoid requirements.
 
 Traffic Server Core
 ===================
