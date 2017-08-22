@@ -15,7 +15,7 @@
    specific language governing permissions and limitations
    under the License.
 
-.. include:: common.defs
+.. include:: ../common.defs
 
 .. _partial_object_caching_architecture:
 
@@ -58,7 +58,7 @@ If, after a cache read hit, there is a pending alternate vector update, the tran
    *  Go direct to origin without caching.
    *  Fail the transaction with an error.
    *  Serve stale content (if available).\\aspx
-   
+
 Note that serving stale content is not always an option as it may not exist (e.g., the transaction is waiting on a request for a new object). In that case the transaction will have to fall back again to one of the other options.
 
 If there is no pending alternate vector update or such an update completes within the time limit, then :term:`alternate selection` is performed, selecting a specific alternate for the request. This can result in a selection of "none" meaning no alternate was suitable which is always the case for a new object. A selection of "none" always results in a request to origin to add a new alternate to the alternate vector. If an existing alternate is selected then it is first checked for *coverage*. This is matching the content that is cached against the content requested and current active requests. The request is covered if all requested content is already cached. If the request is not covered then an origin request is made to retrieve the missing content. In this case, if the alternate is stale, then none of the existing content is considered valid when computing the content to request from the origin. Once |TS| is committed to an origin request it should get fresh content [#fn-uncovered-stale]_.
@@ -112,7 +112,7 @@ Because of this the original alternate content remains available in the alternat
 .. note::
 
    It is not yet clear when the request and response headers in the alternate vector are updated. This may happen when the origin server response header is merged with the cached response header. :cpp:func:`CacheVC::set_http_info` updates :cpp:member:`CacheVC::alternate` but shallowly so that the alternate vector is unaltered. As best I can tell the cleanup logic depends on an alternate never getting updated more than once while the :cpp:class:`OpenDirEntry` exists. If multiple writers are not allowed then the :cpp:class:`OpenDirEntry` is destoyed when the write completes which in turn destroys the newly allocated alternate. If multiple writers are allowed it's not as clear but I think it's presumed these must all be for different alternates and therefore when the last writer CacheVC closes it will trigger the same cleanup as the single writer case. There is in fact a comment implying that in :file:`!CacheWrite.cc` which states that only the first writer of multiple writers can do an update which in turns means an alternate can't be updated twice. This implies that alternates are not destroyed until the :cpp:class:`OpenDirEntry` is destroyed.
-   
+
 Background Fill
 ===============
 
@@ -126,7 +126,7 @@ However it may be the case that background fill is used in such situations as a 
 .. [#fn-uncovered-stale]
 
    This is a form of revalidation in that the stale content should all be discarded from the alternate and placed in the stale buffer in the ODE.
-   
+
 .. [#fn-partial-revalidate]
 
    When the alternate is stale but the request is partial, should a conditional partial request be sent to the origin? That's proably reasonable. If the response is 304 then all is good, otherwise the current content should be discarded and replaced with just the partial response. Note that this doesn't stack like a normal content fill because it is also a pending alternate vector update.
