@@ -18,7 +18,6 @@ Projects planned for Apache |TS|.
 
    ats-projects.en
    poc/poc-index
-   github-pages.en
 
 Reference
 =========
