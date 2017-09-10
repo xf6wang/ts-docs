@@ -26,7 +26,20 @@ digraph {
     RPC_refactor -> {RPC_library RPC_manager_no_delay RPC_bidirectional RPC_plugin};
     RPC_library -> RPC_manager_no_delay;
     RPC_library -> RPC_bidirectional;
-    RPC_bidirectional -> RPC_plugin
+    RPC_bidirectional -> RPC_plugin;
   }
 
+  subgraph {
+    poc [shape=rect style=rounded];
+    cache_toolkit [shape=rect style=rounded];
+    cache_tool [shape=rect style=rounded];
+
+    poc -> cache_toolkit;
+    cache_tool -> cache_toolkit;
+  }
+
+}
+
+digraph {
+  live_restart [shape=folder]
 }

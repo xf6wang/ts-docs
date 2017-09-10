@@ -13,7 +13,8 @@ I have a number of additional projects to improve the AuTest framework for use w
 Pure Replay testing
 ===================
 
-It should be possible to have run tests using only a replay file and potentially some configuration information, without any Python code at all. This requires the micro-DNS server.
+It should be possible to have run tests using only a replay file and potentially some configuration
+information, without any Python code at all. This requires the micro-DNS server.
 
 Header Comparators
 ==================
@@ -48,3 +49,29 @@ Production Verification
 
 It would be nice to be able to run AUTest against live production systems to verify behavior,
 particularly with regard to paranoid requirements.
+
+Configuration Verification
+==========================
+
+AuTest could be integrated with configuration management. This would involve setting up a |TS|
+instance with a proposed configuration deployment in a non-production environment and then verifying
+various functional properties. This would similar to production verification but presumably more
+thorough and focused on operatoinsl needs.
+
+Replay File Format
+==================
+
+`Basic schema <_static/json/replay-file.json>`_.
+
+Diagrams
+========
+
+.. graphviz::
+
+   digraph {
+       testing_project [label="Testing" shape=folder];
+       replay_file_design [label="Replay File\nDesign" shape=rect style=rounded];
+       replay_file_testing [label="Replay File\nBased Testing"]
+
+       testing_project -> {replay_file_design};
+   }

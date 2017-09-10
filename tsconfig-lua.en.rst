@@ -127,3 +127,9 @@ Interface
       Get the value for the key :arg:`name`. If this is not a :code:`table` or there the key
       :arg:`name` is not in the table, a :code:`nil` value is returned.
 
+Future Work
+===========
+
+It would be beneficial if configuration could be grouped by specific applications / properties /
+customers instead of by subsystem.
+

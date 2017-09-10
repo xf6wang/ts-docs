@@ -128,6 +128,10 @@ advantage of the openSSL session table while still sharing them across a pod. Ad
 look at removing the use of MDBM both for reliability and the potential to contribute the TLS
 session resuse plugin to open source.
 
+Use :code:`std::chrono`.
+
+Prevent restart on cache failure (bad disks).
+
 Dynamic Cert Loader
 ===================
 
@@ -171,3 +175,29 @@ openSSL 1.1
 
 TLS/1.3
    This is a soon to be standard. We should start planning for it.
+
+Cache API Toolkit
+=================
+
+This is a restructuring of how the cache to enable fine grained control by plugins. Put in a reference to the summit presentation on this.
+
+Live Restart
+============
+
+A long running request is to be able to do a live restart of |TS|. The mechanism would be
+
+*  Start new |TS| process.
+*  New process starts accepting connections.
+*  Old process stops accepting connections.
+*  Old process shuts down.
+
+   *  When all inbound connections have terminated.
+   *  When there are less than a specified number of inbound connections.
+   *  After a specific amount of time.
+   *  When explicitly requested by the administrator.
+
+The main difficulty for this is handling the cache. To some extent the cache would need to be
+multi-process. To make this more feasible the access would be single writer and the control of
+writing would pass from the old process to the new process. This may mean terminating cache writes
+in the old process.
+
