@@ -29,7 +29,8 @@ resurrected and improved. After discussion among the group it seems that for rep
 content is unnecessary, only the size matters. It is still debated if full capture is useful for
 debugging purposes. My opinion is it is not and complicates the capture process unnecessarily.
 
-I think in terms of building out the replay tooling we need a plugin that can to some extent record traffic. The data recorded should be in the replay file format and contain
+I think in terms of building out the replay tooling we need a plugin that can to some extent record
+traffic. The data recorded should be in the replay file format and contain
 
 *  Each session and the transactions in the session.
 *  Timestamps.
@@ -61,7 +62,17 @@ thorough and focused on operatoinsl needs.
 Replay File Format
 ==================
 
-`Basic schema <_static/json/replay-file.json>`_.
+The replay file is basically a list of sessions. Each session contains connection information and a
+list of transactions. Each transaction contains some meta data and set of our transaction headers.
+These are the inbound request, the outbound request, the upstream response, and the inbound
+response.
+
+Each transaction can also have a UUID which can be used to specify the appropriate response. The
+UUID can be sent along with the transaction as an extra header if needed. Otherwise the transactions
+must be matched up based on other data in the request.
+
+*  `File schema <_static/json/replay-file.json>`_.
+*  `Transaction header schema <_static/json/header.json>`_.
 
 Diagrams
 ========
@@ -71,7 +82,10 @@ Diagrams
    digraph {
        testing_project [label="Testing" shape=folder];
        replay_file_design [label="Replay File\nDesign" shape=rect style=rounded];
-       replay_file_testing [label="Replay File\nBased Testing"]
+       replay_file_testing [label="Replay File\nBased Testing" shape=rect style=rounded]
+       configuration_verification [label="Configuration\nVerification" shape=rect style=rounded]
+       production_verification [label="Production\nVerification" shape=rect style=rounded]
 
        testing_project -> {replay_file_design};
+       replay_file_design -> {production_verification, configuration_verification, replay_file_testing}
    }

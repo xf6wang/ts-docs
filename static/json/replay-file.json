@@ -1,12 +1,18 @@
 {
     "$schema": "http://solidwallofcode.github.io/_static/json/replay-file.json",
     "title": "Traffic Server Replay File",
-    "description": "Data for replaying Traffic Server sessions and transactions.",
+    "description": "Data for Traffic Server sessions and transactions.",
     "type": "object",
     "properties": {
        "meta": {
           "description": "Metadata for the file.",
-          "type": "object"
+          "type": "object",
+          "properties": {
+            "version": {
+                "description": "File format version.",
+                "type": "string"
+            }
+          }
        },
        "sessions": {
           "description": "List of sessions",

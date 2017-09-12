@@ -117,7 +117,11 @@ The crypto hash support needs to be cleaned up.
 
 Look at using `TBB <https://www.threadingbuildingblocks.org>`_ for thread safe containers.
 
-Add log tags to dump transaction headers in full. This would be useful for the operations teams. The idea is a custom log is setup that logs the full headers but is filtered by error return codes. The result is a log of full headers only for failed transactions. We had originally looked at doing this with a plugin but Dan Xu discovered that it would be easier to add these tags and use the existing logging mechanisms.
+Add log tags to dump transaction headers in full. This would be useful for the operations teams. The
+idea is a custom log is setup that logs the full headers but is filtered by error return codes. The
+result is a log of full headers only for failed transactions. We had originally looked at doing this
+with a plugin but Dan Xu discovered that it would be easier to add these tags and use the existing
+logging mechanisms.
 
 TLS Session re-use updates. Currently TLS session re-use is done by having the plugin directly
 control the openSSL callbacks. This leads to conflicts and also requires some custom core changes
@@ -131,6 +135,10 @@ session resuse plugin to open source.
 Use :code:`std::chrono`.
 
 Prevent restart on cache failure (bad disks).
+
+Transaction arenas for plugin use.
+
+Pending event counting at base event loop / continuation.
 
 Dynamic Cert Loader
 ===================
@@ -200,4 +208,3 @@ The main difficulty for this is handling the cache. To some extent the cache wou
 multi-process. To make this more feasible the access would be single writer and the control of
 writing would pass from the old process to the new process. This may mean terminating cache writes
 in the old process.
-
