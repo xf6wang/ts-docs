@@ -133,3 +133,67 @@ Future Work
 It would be beneficial if configuration could be grouped by specific applications / properties /
 customers instead of by subsystem.
 
+Schema
+======
+
+Configuration data should be schema based. Use Lua for syntax and take structure from JSON schema. The schema is used to generate a C++ structure that contains schema data along with storage for configuration data. Code is written to look up data in the configuration structure and populate a C++ domain specific structure.
+
+For SNI configuration, this is a mapping of FQDNs to actions and properties. To support this we will
+need type references / definitions and enumerations.
+
+The schema will be used to build a C++ structure that models the schema and contains storage for data extracted from the configuration file. Loading will take a path and an instance of the configuration structure. Any data from the schema that is needed must be embedded in the configuration structure.
+
+Example use::
+
+   TsConfig loader; // configuration loading class.
+   SNIConfig tls_conf; // Schema & output structure. Name derived from schema data.
+   ts::Errata r = loader.load(path, tls_conf); // path to file, reference to schema struct.
+
+Example schema for SNI configuration.
+
+.. code-block:: lua
+
+   {
+      "$scheme": "URI",
+      name: "TLS",
+      cname: "SNIConfig",
+      global: "sni_config",
+      type: "array",
+      items: {
+         type: "object",
+         properties: {
+            fqdn: {
+               type: "string",
+               validators: ()
+                  fqdn-check
+               )
+            }
+         }
+      }
+   }
+
+Example configuration file::
+
+   sni_config = {
+      { fqdn:"one.com", action:TLS.ACTION.TUNNEL, upstream_cert_verification:TLS.VERIFY.REQUIRED}
+   }
+
+Example C++ data structure::
+
+   struct SNIConfig {
+      enum class Action { CLOSE, TUNNEL };
+      struct Item {
+         std::string fqdn;
+         Action action;
+
+         // Store functions move data from top of the Lua stack to a member
+         // in this struct. There are generic functions per type, these functions
+         // call the generic ones, passing in the address of the member. These
+         // get filled in by the constructor, or are static members.
+         // @note Might want to make these structs which contain all the relevant schema data
+         // along with the store functions.
+         using Errata StoreFunc(luaState_* s, Item&, ts::string_view name)
+         std::unordered_set<std::string, StoreFunc> _handlers;
+      };
+      std::vector<Item> items;
+   }
