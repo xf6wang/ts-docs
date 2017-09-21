@@ -145,9 +145,8 @@ The schema will be used to build a C++ structure that models the schema and cont
 
 Example use::
 
-   TsConfig loader; // configuration loading class.
    SNIConfig tls_conf; // Schema & output structure. Name derived from schema data.
-   ts::Errata r = loader.load(path, tls_conf); // path to file, reference to schema struct.
+   ts::Errata r = tls_conf.load(path); // path to file
 
 Example schema for SNI configuration.
 
@@ -164,8 +163,7 @@ Example schema for SNI configuration.
          properties: {
             fqdn: {
                type: "string",
-               validators: ()
-                  fqdn-check
+               validators: { fqdn-check }
                )
             }
          }
@@ -180,20 +178,86 @@ Example configuration file::
 
 Example C++ data structure::
 
-   struct SNIConfig {
+   class TsConfigDescriptor {
+      enum class Type { ARRAY, OBJECT, INT, FLOAT, STRING, ENUM };
+      std::string name;
+      std::string description;
+      Type type;
+      std::string type_name;
+   };
+
+   class TsConfigEnumDescriptor : public TsConfigBaseDescriptor {
+      std::unordered_map<std::string, int> values;
+      std::unordered_map<int, std::string> keys;
+   }
+
+   class TsConfigObjectDescriptor : public TsConfigBaseDescriptor {
+      std::unordered_map<std::string, TsConfigBaseDescriptor const*> fields;
+   };
+
+   class TsConfigArrayDescriptor : public TsConfigBaseDescriptor {
+      TsConfigArrayDescriptor(TsConfigBaseDescriptor const& d) : item(d) {}
+      TsConfigBaseDescriptor const& item;
+   }
+
+   /* Base class of config structures for generic access.
+
+      Each config class has a static member of type @c TsConfigDesciptor or a subclass.
+      A reference to that member is passed to this base class in the constructor. Then
+      access is available generically by casting the config structure to this class.
+
+      @note The reference mechanism is needed so that each config struct can have its own
+      instance with static values. If inherited there would be only one for all subclasses.
+   */
+   class TsConfigBase {
+      TsConfigBase(TsConfigDescriptor const& d) : descriptor(d) {}
+      TsConfigDescriptor const& descriptor;
+
+      virtual ts::Errata loader(lua_State* s) = 0;
+   };
+
+   template < typename T >
+   class TsConfigInt : public TsConfigBase {
+      TsConfigInt(TsConfigDesciptor const& d, (T::int)& i) : TsConfigBase(d), ref(i) {}
+      T::int & ref;
+      ts::Errata loader(lua_State* s) override;
+   }
+
+   template < typename T, typename E >
+   class TsConfigEnum : public TsConfigBase {
+      TsConfigInt(TsConfigDesciptor const& d, (T::E)& i) : TsConfigBase(d), ref(i) {}
+      T::E & ref;
+      ts::Errata loader(lua_State* s) override;
+   }
+
+   struct LuaSNIConfig : public TsConfigBase {
+      using self = LuaSNIConfig;
       enum class Action { CLOSE, TUNNEL };
-      struct Item {
+
+      static TsConfigArrayDescriptor DESCRIPTOR;
+      LuaSNIConfig() : TsConfigBase(DESCRIPTOR), DESCRIPTOR(Item::DESCRIPTOR) {}
+
+      struct Item : public TsConfigBase {
+         Item() : TsConfigBase(DESCRIPTOR),
+            FQDN_CONFIG(FQDN_DESCRIPTOR, &self::fqdn),
+            LEVEL_CONFIG(LEVEL_DESCRIPTOR, &self::level),
+            ACTION_CONFIG(ACTION_DESCRIPTOR, &self::action)
+            { }
+         Errata loader(lua_State* s) override;
+
          std::string fqdn;
+         int level;
          Action action;
 
-         // Store functions move data from top of the Lua stack to a member
-         // in this struct. There are generic functions per type, these functions
-         // call the generic ones, passing in the address of the member. These
-         // get filled in by the constructor, or are static members.
-         // @note Might want to make these structs which contain all the relevant schema data
-         // along with the store functions.
-         using Errata StoreFunc(luaState_* s, Item&, ts::string_view name)
-         std::unordered_set<std::string, StoreFunc> _handlers;
+         // These need to be initialized statically.
+         static TsConfigObjectDescriptor DESCRIPTOR;
+         static TsConfigBaseDescriptor FQDN_DESCRIPTOR;
+         static TsConfigString<Item> FQDN_CONFIG;
+         static TsConfigBaseDescriptor LEVEL_DESCRIPTOR;
+         static TsConfigInt<Item> LEVEL_CONFIG;
+         static TsConfigEnumDescriptor ACTION_DESCRIPTOR;
+         static TsConfigEnum<Item, ACTION> ACTION_CONFIG;
       };
       std::vector<Item> items;
+      ts::Errata loader(lua_State* s) override;
    }
