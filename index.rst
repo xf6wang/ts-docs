@@ -23,6 +23,11 @@ Reference
 =========
 
 .. toctree::
+   :maxdepth: 1
+
+   guide.en
+
+.. toctree::
    :hidden:
 
    external-types.en
