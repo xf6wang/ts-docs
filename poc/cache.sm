@@ -1,0 +1,50 @@
+%{
+%}
+
+%class ATS
+%start Cache::idle
+%map Cache
+%%
+
+idle {
+    open_write(CacheKey: key) open_write {}
+}
+
+Finish {
+
+}
+
+open_write
+    Entry { new_CacheVC(); lockStripe(); }
+{
+    lock_failed [! locked] CacheVC::openWriteStartBegin {}
+    overwrite [f.overwrite] CacheVC::openWriteOverwrite {}
+    write CacheVC::openWriteInit {}
+}
+
+%%
+
+%map OpenDirEntry
+%%
+
+open {
+
+}
+%%
+
+%map CacheVC
+%%
+    openWriteStartBegin
+        Entry { lockStripe(); }
+    {
+        reschedule [! locked] openWriteStartBegin {}
+    }
+
+    openWriteInit {
+
+    }
+
+    openWriteOverwrite {
+
+    }
+%%

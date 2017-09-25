@@ -8,6 +8,8 @@ Partial object caching is the ability to cache range requests and assemble full 
 .. toctree::
    :maxdepth: 2
 
+   poc-logic.en
+   poc-data-structures.en
    cache-types.en
    cache-glossary.en
 

@@ -16,7 +16,7 @@ help:
 	@echo "  dirhtml    to make HTML files named index.html in directories"
 	@echo "  singlehtml to make a single large HTML file"
 
-html:
+html: poc/cache_sm.dot
 	$(SBUILD) -d $(BUILDDIR)/doctrees -b html $(srcdir) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
@@ -37,3 +37,6 @@ clean:
 
 publish:
 	$(SHELL) ./publish.sh
+
+poc/cache_sm.dot: poc/cache.sm
+	java -jar ~/opt/smc_6_6_3/bin/Smc.jar -graph -glevel 1 ~/git/ts-docs/poc/cache.sm
