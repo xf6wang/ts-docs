@@ -8,18 +8,22 @@
          ["$schema"]= {
             type= "string",
             description= "Schema identifier."
-         }
+         },
          cname= {
             type= "string",
             description= "Schema name, used as container class name.",
          },
-         properties= {
-            type="object",
-            additionalItems=true
-         },
-         name= {
+         type={
             type="string",
-            description="Name of configuration value."
+            enum={'null', 'boolean', 'object', 'array', 'number', 'string'}
+         },
+         properties={
+            type="object",
+            additionalProperties:{
+               type:'object',
+               description:''
+            },
+            additionalProperties=true
          },
          description= {
             type="string",

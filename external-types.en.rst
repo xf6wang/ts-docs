@@ -12,6 +12,13 @@ Traffic Server
 ==============
 
 .. type:: ts
+.. c:type:: TSReturnCode
+.. c:type:: TSHttpTxn
+.. c:type:: TSIOBufferReader
+.. c:type:: TSIOBufferBlock
+.. c:type:: TSIOBuffer
+.. c:function:: void * TSmalloc(size_t n)
+.. c:function:: char * TSstrdup(char * str)
 
 .. class:: string_view
 
@@ -20,6 +27,7 @@ Traffic Server
 .. namespace:: ts
 .. class:: Errata
 .. namespace:: NULL
+
 
 STL types
 =========
@@ -34,3 +42,10 @@ Builtin Types
 =============
 
 .. type:: size_t
+.. c:type:: int64_t
+.. c:type:: bool
+
+.. _custom-logging-fields:
+
+Reference Stubs
+===============

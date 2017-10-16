@@ -86,7 +86,11 @@ This creates a container class.
                         _meta_counter(counter, COUNTER_DESCRIPTOR)
       {}
 
-      ts::Errata loader(std::string const& path) override;
+      /// Load from the file at @a path.
+      ts::Errata load(std::string const& path);
+
+      /// Data loader method.
+      ts::Errata loader(lua_State * s) override;
 
       /// Number of items to track.
       int counter;
@@ -122,7 +126,7 @@ Loading the configuration is done by
 .. code-block:: cpp
 
    CounterConfig config;
-   config->loader("counter.config");
+   config->load("counter.config");
    // ...
    tracker.resize(config.counter); // Use loaded value.
 
@@ -131,6 +135,35 @@ A valid configuration example
 .. code-block:: lua
 
    ItemCounter = 17;
+
+Enumerations
+------------
+
+Being able to contrain primitive values to a specific set of values is critical to providing good
+feedback for configurations. Data for an enumeration is stored in a static instance of
+:class:`TsConfigEnumDescriptor`. This contains two mappings, from string keys to numeric values and
+from numeric values to string keys. These values should be available in C++ and in Lua.
+
+For Lua enumerations are stored as tables attached to predefined global variables. The schema
+supports defining such enumerations and specifying the global variable. Note this can be a nested
+path so that a schema could have a single top level global for its enumerations with each
+enumeration an entry in the global table. The presumption is the enumeration values are integers and
+these are the values passed to the configuration loader, specified by the global value. This is
+intended to minimize undetected typographic errors in the configuration file.
+
+Enumerations are defined in a top level key of the schema named ``definitions``. Enumerations are
+restricted to mappings between strings ("keys") and integers ("values"). The mapping can be defined
+in multiple ways.
+
+Lua array of strings
+   The keys are the strings in the array and the corresponding values the index of the string in the array.
+
+Lua table
+   This must be a map between strings and integers, in either direction. A mapping from integers to
+   strings is flipped to its dual. Duplicated keys or values are an error.
+
+The schema data for an enumeration is stored in a static instance of
+:class:`TsConfigEnumDescriptor`. The internal maps are initialized by the constructor.
 
 Interface
 =========
@@ -174,6 +207,26 @@ Interface
 .. class:: TsConfigDescriptor
 
    Base class for schema element descriptions.
+
+.. class:: TsConfigEnumDescriptor : public TsConfigDescriptor
+
+   Schema data for an enumeration type.
+
+   .. function:: ts::string_view operator [] (int value) const
+
+      Find the key for the :arg:`value`. An :code:`std::out_of_range` exception is thrown if :arg:`value` is not valid.
+
+   .. function:: int operator [] (ts::string_view key) const
+
+      Find the value for the :arg:`key`. An :code:`std:out_of_range` exception is thrown if :arg:`key` is not valid.
+
+   .. function:: bool is_valid(int value) const
+
+      Check if :arg:`value` is valid.
+
+   .. function:: bool is_valid(ts::string_view key) const
+
+      Check if :arg:`key` is vald.
 
 Schema
 ======
