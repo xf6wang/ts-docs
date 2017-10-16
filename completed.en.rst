@@ -1,6 +1,6 @@
 .. include:: common.defs
 
-.. _ats-projects:
+.. _completed-ats-projects:
 
 Completed Projects
 ***********************

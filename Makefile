@@ -39,4 +39,4 @@ publish:
 	$(SHELL) ./publish.sh
 
 poc/cache_sm.dot: poc/cache.sm
-	java -jar ~/opt/smc_6_6_3/bin/Smc.jar -graph -glevel 1 ~/git/ts-docs/poc/cache.sm
+	java -jar ~/opt/smc_6_6_3/bin/Smc.jar -graph -glevel 0 ~/git/ts-docs/poc/cache.sm

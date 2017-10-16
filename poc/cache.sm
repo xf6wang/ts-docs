@@ -3,11 +3,13 @@
 
 %class ATS
 %start Cache::idle
+
+
 %map Cache
 %%
 
 idle {
-    open_write(CacheKey: key) open_write {}
+    Cache::open_write(CacheKey: key) open_write {}
 }
 
 Finish {
@@ -24,27 +26,42 @@ open_write
 
 %%
 
+%map Vol
+%%
+Default {
+    Default [locked] pop(LOCK_READY) {dispatch();}
+}
+%%
+
 %map OpenDirEntry
 %%
 
-open {
-
+Default {
+    Locked pop(LOCK_READY) {dispatch();}
 }
 %%
 
 %map CacheVC
 %%
-    openWriteStartBegin
-        Entry { lockStripe(); }
-    {
-        reschedule [! locked] openWriteStartBegin {}
-    }
+openWriteStartBegin
+    Entry { lock_stripe(); }
+{
+    unlocked push(dummy) {}
+    dummy dummy {}
+    LOCK_READY openWriteInit {}
+}
 
-    openWriteInit {
+dummy {
+    lock  pop(LOCK_READY) {}
+}
 
-    }
+openWriteInit
+    Entry { lock_od(); }
+{
+    unlocked [! locked] push(OpenDirEntry::Default) {}
+}
 
-    openWriteOverwrite {
+openWriteOverwrite {
 
-    }
+}
 %%

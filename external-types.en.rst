@@ -11,7 +11,6 @@ External Types
 Traffic Server
 ==============
 
-.. type:: ts
 .. c:type:: TSReturnCode
 .. c:type:: TSHttpTxn
 .. c:type:: TSIOBufferReader
@@ -20,11 +19,12 @@ Traffic Server
 .. c:function:: void * TSmalloc(size_t n)
 .. c:function:: char * TSstrdup(char * str)
 
+.. type:: ts
+.. namespace:: ts
 .. class:: string_view
 
    A local implementation of the C++17 `std::string_view <http://en.cppreference.com/w/cpp/string/basic_string_view>`_. See :ts:git:`lib/ts/string_view.h`.
 
-.. namespace:: ts
 .. class:: Errata
 .. namespace:: NULL
 
