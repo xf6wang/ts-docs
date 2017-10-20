@@ -1,0 +1,13 @@
+@startuml
+
+Cache_open_write -> CacheVC_init_write
+Cache_open_write : Create CacheVC
+
+State CacheVC_init_write {
+  [*] -> lock_stripe
+  lock_stripe -> od_open_write : locked
+  lock_stripe -> [*] : unlocked
+  od_open_write -> [*]
+}
+
+@enduml
