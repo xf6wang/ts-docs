@@ -1,0 +1,22 @@
+@startuml
+
+skinparam defaultTextAlignment left
+
+package Build {
+  file "Config Schema" as schema
+  file "Generated C++" as code
+}
+package Runtime {
+  file  "Lua Configuration" as config
+  component "Lua State" as lua
+  component "Config Struct Instance" as instance
+  component "Traffic Server" as ts
+}
+
+schema ..> code : Generates
+lua ..> config : Read/Executes
+ts ..> instance : Create\nInvoke\nExamine data
+instance ..> code : Uses
+instance ..> lua : Create\nExecute\nRetrieve Data
+
+@enduml
