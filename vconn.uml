@@ -1,0 +1,41 @@
+@startuml
+
+legend
+Writer Initiated I/O
+endlegend
+
+actor Writer
+participant write_VIO
+database TSVConn
+participant read_VIO
+actor Reader
+
+group Setup
+activate TSVConn
+Writer --> TSVConn : TSVConnWrite
+note left : Create TSIOBuffer
+activate write_VIO
+Reader --> TSVConn : TSVConnRead
+note right : Get TSIOBuffer from TSVConn
+activate read_VIO
+Reader --> Writer : TS_EVENT_VCONN_WRITE_READY
+end
+
+loop Transfer
+note left of Writer : Add data to TSIOBuffer
+Writer --> Reader: TS_EVENT_VCONN_READ_READY
+
+note right of Reader : Consume data from TSIOBuffer
+Reader --> Writer : TS_EVENT_VCONN_WRITE_READY
+end
+
+note over Writer, Reader : When VIO bytes done == VIO bytes todo
+
+group Finish
+Writer --> TSVConn : TS_EVENT_VCONN_WRITE_COMPLETE
+deactivate write_VIO
+Reader --> TSVConn : TS_EVENT_VCONN_READ_COMPLETE
+deactivate read_VIO
+end
+
+@enduml

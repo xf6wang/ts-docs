@@ -1,0 +1,23 @@
+@startuml
+
+skinparam defaultTextAlignment left
+
+!definelong ApiCallOut(Hook, In, Out)
+  state "API Callout" as CB##Hook <<HOOK>>
+  iIn --> CB##Hook
+  CB##Hook --> Out
+!enddefinelong
+
+skinparam state {
+  BackgroundColor<<HOOK>> Peru
+}
+
+state Accept {
+
+}
+
+state HttpSM {
+
+}
+
+@enduml

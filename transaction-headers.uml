@@ -1,0 +1,19 @@
+@startuml
+
+actor UserAgent
+
+UserAgent -> HttpSM : HTTP Request
+note over UserAgent, HttpSM #FFDDDD : Client Request
+hnote over UserAgent, HttpSM #DDDDFF : ""TSHttpTxnClientReqGet""
+HttpSM -> Upstream : connect
+HttpSM -> Upstream : HTTP Request
+note over HttpSM, Upstream #DDFFDD : Server Request
+hnote over HttpSM, Upstream #DDDDFF : ""TSHttpTxnServerReqGet""
+Upstream -> HttpSM : HTTP Response
+note over Upstream, HttpSM #FFDDDD : Server Response
+hnote over Upstream, HttpSM #DDDDFF : ""TSHttpTxnServerRespGet""
+HttpSM -> UserAgent : HTTP Response
+note over HttpSM, UserAgent #DDFFDD : Client Response
+hnote over HttpSM, UserAgent #DDDDFF : ""TSHttpTxnClientRespGet""
+
+@enduml

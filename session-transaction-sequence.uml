@@ -1,0 +1,42 @@
+@startuml
+
+actor UserAgent
+
+UserAgent -> ProxyPort : connect
+group Session
+ProxyPort -> ProxyClientSession : SSN_START
+activate ProxyClientSession
+group Transaction
+UserAgent -> ProxyClientSession : HTTP Request
+note over UserAgent, ProxyPort : Client Request
+ProxyClientSession -> HttpSM : TXN_START
+activate HttpSM
+HttpSM -> Upstream : connect
+HttpSM -> Upstream : HTTP Request
+note over HttpSM, Upstream : Server Request
+Upstream -> HttpSM : HTTP Response
+note over Upstream, HttpSM : Server Response
+HttpSM -> UserAgent : HTTP Response
+note over HttpSM, UserAgent : Client Response
+HttpSM -> HttpSM : TXN_CLOSE
+destroy HttpSM
+end
+
+group Transaction
+UserAgent -> ProxyClientSession : HTTP Request
+ProxyClientSession -> HttpSM : TXN_START
+activate HttpSM
+HttpSM -> Upstream : connect
+HttpSM -> Upstream : HTTP Request
+Upstream -> HttpSM : HTTP Response
+HttpSM -> UserAgent : HTTP Response
+HttpSM -> HttpSM : TXN_CLOSE
+destroy HttpSM
+end
+
+UserAgent -> ProxyClientSession : FIN
+ProxyClientSession -> ProxyClientSession : SSN_CLOSE
+destroy ProxyClientSession
+end
+
+@enduml

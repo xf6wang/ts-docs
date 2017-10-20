@@ -1,7 +1,8 @@
 {
-   ["$scheme"]= "http://trafficserver.apache.org/config/sni-remap",
+   ["$schema"]= "http://trafficserver.apache.org/config/sni-remap",
    name= "SNIConfig",
    global= "sni_config",
+   type="object",
    properties= {
       type="array",
       items= {
@@ -22,13 +23,13 @@
       tls_action={
          key='string',
          type='integer',
-         global='TLS.ACTION',y
+         lua='TLS.ACTION',
          kv={NONE=0,TUNNEL=1,CLOSE=2}
       },
       cert_verification={
          key='string',
          type='integer',
-         global='TLS.VERIFICATION',
+         lua='TLS.VERIFICATION',
          kv={NONE, WARN, REQUIRE}
       }
    }
