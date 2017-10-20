@@ -1,13 +1,78 @@
 @startuml
 
-Cache_open_write -> CacheVC_init_write
-Cache_open_write : Create CacheVC
+skinparam defaultTextAlignment left
 
-State CacheVC_init_write {
-  [*] -> lock_stripe
-  lock_stripe -> od_open_write : locked
-  lock_stripe -> [*] : unlocked
-  od_open_write -> [*]
+!definelong WaitFor(x,y,signal,condition = "wait") \
+  state "x" as External##x <<External>>
+  y --> External##x : condition
+  External##x --> y : <&pulse> signal
+!enddefinelong
+
+skinparam state {
+  BackgroundColor<<External>> Peru
+}
+state CacheVC {
+  state "open_write_entry" as CacheVC__open_write_entry
+  state "open_first_doc" as CacheVC__open_first_doc
+  state "read_altvec" as CacheVC__read_altvec
+  state "alt_select" as CacheVC__alt_select : Select Alternate
+  state "write_init" as CacheVC__write_init
+
+  CacheVC__open_write_entry : Open ODE for write.
+  CacheVC__open_first_doc :\
+    <U+25C6> reading altvec?\n\
+    <U+25C6> FirstDoc present?
+  CacheVC__read_altvec: <U+25c6> handle I/O\n\
+    <U+25c6> probe directory\n\
+    <U+25c6> stripe->do_read_call()
+  CacheVC__write_init : <U+25C6> Allocate new slice.
+
+  CacheVC__write_start : <U+25C6> Compute missing chunks.\n<U+25C6>
+
+  state "close" as CacheVC__FATAL
+  CacheVC__FATAL : Unrecoverable error\nClose CacheVC
+}
+
+state Cache {
+
+  state "open_write" as Cache__open_write
+
+  Cache__open_write : Allocate & Init CacheVC
+
+  [*] --> Cache__open_write
+  Cache__open_write --> CacheVC__open_write_entry
+
+}
+
+state ODE {
+}
+
+state CacheVC {
+  CacheVC__open_write_entry -u-> CacheVC__open_write_entry : stripe <&lock-unlocked>
+  CacheVC__open_write_entry --> CacheVC__open_first_doc
+  CacheVC__open_write_entry --> CacheVC__FATAL : ODE open fail.
+
+  CacheVC__open_first_doc -u-> CacheVC__open_first_doc : ODE <&lock-unlocked>
+  WaitFor(ODE, CacheVC__open_first_doc, ODE_ALTVEC_UPDATED, "<&check> reading altvec")
+  CacheVC__open_first_doc --> CacheVC__read_altvec : <U+2205>\n<U+23F5> mark altvec read active\n<U+23F5> unlock ODE
+
+  CacheVC__open_first_doc --> CacheVC__alt_select : <&check> FirstDoc
+
+  CacheVC__read_altvec -u-> CacheVC__read_altvec : stripe <&lock-unlocked>
+  CacheVC__read_altvec -u-> CacheVC__read_altvec : collision
+  CacheVC__read_altvec --> CacheVC__write_init : <&check> dir_probe miss
+  CacheVC__read_altvec --> CacheVC__alt_select : <&check> dir_probe hit\n\
+    <U+23F5> Update altvec\n\
+    <U+23F5> signal ODE_ALTVEC_UPDATED
+
+  CacheVC__alt_select -u-> CacheVC__alt_select : ODE <&lock-unlocked>
+  CacheVC__alt_select --> CacheVC__write_init : <&check> No alternate selected
+  CacheVC__alt_select --> CacheVC__write_start : <&check> alternate selected
+
+  CacheVC__write_init -u-> CacheVC__write_init : ODE <&lock-unlocked>
+
+  CacheVC__write_start -u-> CacheVC__write_start : ODE <&lock-unlocked>
+
 }
 
 @enduml
