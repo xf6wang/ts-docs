@@ -1,0 +1,94 @@
+@startuml
+
+package L7R {
+  Component HostDB_L7 [
+    Enable IP address resolution
+    from an HTTP request.
+  ]
+  Component HostDB_Plugins [
+    Provide plugin based control
+    of IP address resolution.
+  ]
+  Component l7_resolver [
+    Request Resolver
+  ]
+  Component L7R [
+    Resolve upstream target
+    from HTTP request.
+  ]
+
+  L7R ..> l7_resolver : Requires
+}
+
+package TsLuaConfig {
+  Component TsLuaConfigSchemaParser [
+    Parser for Lua
+    configuration schemas.
+    C++ code generator.
+  ]
+  Component TsLuaConfigMetaSchema [
+    Lua schema that describes
+    Lua configuration schema.
+  ]
+  Component TsLuaConfigInternals [
+    Design of C++
+    configuration code.
+  ]
+  TsLuaConfigSchemaParser ..> TsLuaConfigMetaSchema : Uses
+  TsLuaConfigSchemaParser ..> TsLuaConfigInternals : Requires
+  TsLuaConfigMetaSchema ..> TsLuaConfigSchemaParser : Generates
+}
+
+package L4R {
+  Component L4R [
+    Control connections based on
+    L4 information
+  ]
+
+  Component TLS_Control [
+    SNI Based Configuration.
+    TLS control during handshake.
+    Post TLS-handshake handling.
+  ]
+
+  L4R ..> TLS_Control : Requires
+  TLS_Control ..> TsLuaConfigInternals : Requires
+}
+
+package "Cache Tools" {
+  Component POC [
+    Partial Object Caching
+  ]
+  Component CacheTool [
+    Cache Tool
+  ]
+  Component CAT [
+    Cache API Toolkit
+  ]
+  CAT ..> POC : Requires
+  CAT --> CacheTool: After
+}
+
+@enduml
+
+/'
+
+  subgraph {
+    RPC_refactor [shape=folder];
+    RPC_library [shape=rect style=rounded];
+    RPC_manager_no_delay [shape=rect style=rounded];
+    RPC_bidirectional [shape=rect style=rounded];
+    RPC_plugin [shape=rect style=rounded];
+
+    RPC_refactor -> {RPC_library RPC_manager_no_delay RPC_bidirectional RPC_plugin};
+    RPC_library -> RPC_manager_no_delay;
+    RPC_library -> RPC_bidirectional;
+    RPC_bidirectional -> RPC_plugin;
+  }
+
+}
+
+digraph {
+  live_restart [shape=folder]
+}
+'/
