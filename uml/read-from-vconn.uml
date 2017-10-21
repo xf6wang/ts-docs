@@ -6,29 +6,28 @@ endlegend
 
 actor Reader
 participant VIO
-database TSVConn
+entity TSVConn
 
 == Initialization ==
-activate TSVConn
 note over Reader: Create ""TSIOBuffer""
 note over Reader : Allocate ""TSIOBufferReader""
-Reader --> TSVConn : ""TSVConnRead()""
+Reader -> TSVConn : ""TSVConnRead()""
 activate VIO
 
 == Data Transfer ==
 loop
 
-note over TSVConn: Write data to ""TSIOBuffer""
-TSVConn --> Reader : ""TS_EVENT_VCONN_READ_READY""
+note over TSVConn: Write to ""TSIOBuffer""
+TSVConn -> Reader : ""TS_EVENT_VCONN_READ_READY""
 
-note over Reader : Consume data from ""TSIOBufferReader""
-Reader --> VIO : ""TSVIOReenable()""
+note over Reader : Consume from ""TSIOBufferReader""
+Reader -> VIO : ""TSVIOReenable()""
 
 end
 
 == VIO.ndone == VIO.nbytes ==
 
-TSVConn --> Reader : ""TS_EVENT_VCONN_READ_COMPLETE""
+TSVConn -> Reader : ""TS_EVENT_VCONN_READ_COMPLETE""
 deactivate VIO
 
 @enduml

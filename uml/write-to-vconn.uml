@@ -1,3 +1,4 @@
+
 @startuml
 
 legend
@@ -6,29 +7,28 @@ endlegend
 
 actor Writer
 participant VIO
-database TSVConn
+entity TSVConn
 
 == Initialization ==
-activate TSVConn
-note over Writer: Create TSIOBuffer
-note over Writer : Add data to TSIOBuffer
-Writer --> TSVConn : ""TSVConnWrite()""
+note over Writer: Create ""TSIOBuffer""
+note over Writer : Write to ""TSIOBuffer""
+Writer -> TSVConn : ""TSVConnWrite()""
 activate VIO
 
 == Data Transfer ==
 loop
 
-note over TSVConn: Consume data from TSIOBuffer
-TSVConn --> Writer : ""TS_EVENT_VCONN_WRITE_READY""
+note over TSVConn: Consume from ""TSIOBuffer""
+TSVConn -> Writer : ""TS_EVENT_VCONN_WRITE_READY""
 
-note over Writer : Add data to TSIOBuffer
-Writer --> VIO : ""TSVIOReenable()""
+note over Writer : Write to ""TSIOBuffer""
+Writer -> VIO : ""TSVIOReenable()""
 
 end
 
 == VIO.ndone == VIO.nbytes ==
 
-TSVConn --> Writer : ""TS_EVENT_VCONN_WRITE_COMPLETE""
+TSVConn -> Writer : ""TS_EVENT_VCONN_WRITE_COMPLETE""
 deactivate VIO
 
 @enduml

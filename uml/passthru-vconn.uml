@@ -1,0 +1,47 @@
+@startuml
+
+legend
+VConn data pass through
+endlegend
+
+actor Writer
+participant write_VIO
+entity TSVConn
+participant read_VIO
+actor Reader
+
+== Initialization ==
+note over Writer : Create ""TSIOBuffer""
+note over Writer : Add data to ""TSIOBuffer""
+Writer -> TSVConn : ""TSVConnWrite()""
+activate write_VIO
+
+note over Reader: Create ""TSIOBuffer""
+note over Reader : Allocate ""TSIOBufferReader""
+Reader -> TSVConn : ""TSVConnRead()""
+activate read_VIO
+
+== Data Transfer ==
+loop
+
+note over TSVConn: Move data\nWriter ""TSIOBuffer"" <&arrow-thick-right> Reader ""TSIOBuffer""
+TSVConn -> Writer : ""TS_EVENT_VCONN_WRITE_READY""
+TSVConn -> Reader : ""TS_EVENT_VCONN_READ_READY""
+
+note over Writer : Write to ""TSIOBuffer""
+Writer -> write_VIO : ""TSVIOReenable()""
+write_VIO -> TSVConn : TS_EVENT_IMMEDIATE
+note over Reader : Consume from ""TSIOBufferReader""
+Reader -> read_VIO : ""TSVIOReenable()""
+read_VIO -> TSVConn : TS_EVENT_IMMEDIATE
+
+end
+
+== VIO.ndone == VIO.nbytes ==
+
+TSVConn -> Writer : ""TS_EVENT_VCONN_WRITE_COMPLETE""
+deactivate write_VIO
+TSVConn -> Reader : ""TS_EVENT_VCONN_READ_COMPLETE""
+deactivate read_VIO
+
+@enduml
