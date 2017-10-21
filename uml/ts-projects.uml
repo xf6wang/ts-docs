@@ -1,5 +1,8 @@
 @startuml
 
+!define ACTIVE #DDDDFF
+!define DONE #DDFFDD
+
 package L7R {
   Component HostDB_L7 [
     Enable IP address resolution
@@ -46,6 +49,8 @@ package L4R {
   ]
 
   Component TLS_Control [
+    **TLS Control**
+    ----
     SNI Based Configuration.
     TLS control during handshake.
     Post TLS-handshake handling.
@@ -69,6 +74,74 @@ package "Cache Tools" {
   CAT --> CacheTool: After
 }
 
+package "Plugin Coordination" {
+  Component ThreadInitialization [
+    **Thread Initialization**
+    ----
+    Restructure thread initialization
+    to be modular and reliable.
+  ]
+  Component PluginHookFix [
+    **Plugin Hook Restructure**
+    ----
+    Modularize hook dispatch.
+  ]
+  Component PluginTracking [
+    **Plugin Tracking**
+    ----
+    Track source
+    of continuations.
+  ]
+  Component PluginIntrospection [
+    **Plugin Introspection**
+    ----
+    Enable plugins to discover
+    and access other plugins.
+  ]
+  Component PluginControl [
+    **Plugin Control**
+    ----
+    Enable plugins to control
+    dispatch of other plugins
+    callbacks.
+  ]
+  Component PluginPriority [
+    **Plugin Priority**
+    ----
+    Provide control of plugin
+    callback ordering.
+  ]
+  Component PluginReload [
+    **Plugin Reload**
+    ----
+    Dynamically reload plugins.
+  ]
+  PluginTracking ..> PluginHookFix : Requires
+  PluginTracking ..> ThreadInitialization : Requires
+  PluginReload ..> PluginControl : Requires
+  PluginReload --> PluginPriority : After
+  PluginPriority ..> PluginIntrospection : Requires
+  PluginControl ..> PluginIntrospection : Requires
+  PluginIntrospection ..> PluginTracking : Requires
+}
+
+Package Logging {
+  Component BufferWriter DONE [
+    BufferWriter
+  ]
+
+  Component BodyFactory ACTIVE [
+    Use ""MIOBuffer"" in
+    Body Factory.
+  ]
+  BodyFactory ..> BufferWriter : Requires
+}
+
+' Fake links to control layout
+"Plugin Coordination" -[hidden]l- L7R
+"Plugin Coordination" -[hidden]l- L4R
+"Plugin Coordination" -[hidden]- "Cache Tools"
+L7R -[hidden]d-- L4R
 @enduml
 
 /'

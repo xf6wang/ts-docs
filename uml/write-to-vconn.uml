@@ -5,34 +5,30 @@ Writer Initiated I/O
 endlegend
 
 actor Writer
-participant write_VIO
+participant VIO
 database TSVConn
-participant Reader
 
-group Setup
+== Initialization ==
 activate TSVConn
 note over Writer: Create TSIOBuffer
 note over Writer : Add data to TSIOBuffer
-Writer --> TSVConn : TSVConnWrite
-activate write_VIO
-TSVConn --> Reader : TS_EVENT_VCONN_READ_READY
-end
+Writer --> TSVConn : ""TSVConnWrite()""
+activate VIO
 
-loop Transfer
-note over Reader : Consume data from TSIOBuffer
-Reader --> Writer : TS_EVENT_VCONN_WRITE_READY
+== Data Transfer ==
+loop
+
+note over TSVConn: Consume data from TSIOBuffer
+TSVConn --> Writer : ""TS_EVENT_VCONN_WRITE_READY""
 
 note over Writer : Add data to TSIOBuffer
-Writer --> Reader: TS_EVENT_VCONN_READ_READY
+Writer --> VIO : ""TSVIOReenable()""
 
 end
 
-note over Writer, Reader : When VIO bytes done == VIO bytes todo
+== VIO.ndone == VIO.nbytes ==
 
-group Finish
-Writer --> Reader : TS_EVENT_VCONN_WRITE_COMPLETE
-deactivate write_VIO
-Reader --> Writer : TS_EVENT_VCONN_READ_COMPLETE
-end
+TSVConn --> Writer : ""TS_EVENT_VCONN_WRITE_COMPLETE""
+deactivate VIO
 
 @enduml
