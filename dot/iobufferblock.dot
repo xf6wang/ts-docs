@@ -1,0 +1,43 @@
+digraph {
+  IOBufferBlock [shape=plaintext,label=< <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+      <TR><TD BGCOLOR="palegreen" port="name">\N</TD></TR>
+      <TR><TD port="start">start</TD></TR>
+      <TR><TD port="end">end</TD></TR>
+      <TR><TD port="buf_end">buf_end</TD></TR>
+      <TR><TD port="data">data</TD></TR>
+      </TABLE> >
+   ]
+
+  IOBufferData [shape=plaintext, label=< <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+      <TR><TD BGCOLOR="palegreen" port="name">\N</TD></TR>
+      <TR><TD port="data">data</TD></TR>
+      </TABLE> >
+   ]
+
+  IOBuffer [shape=plaintext, label=< <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+      <TR>
+        <TD BGCOLOR="palegreen">\N</TD>
+        <TD sides="l"> </TD>
+        <TD port="start" BGCOLOR="powderblue"> </TD>
+        <TD BGCOLOR="powderblue"> </TD>
+        <TD BGCOLOR="powderblue"> </TD>
+        <TD BGCOLOR="powderblue"> </TD>
+        <TD BGCOLOR="powderblue"> </TD>
+        <TD port="end"> </TD>
+        <TD> </TD>
+        <TD> </TD>
+        <TD> </TD>
+        <TD port="buf_end" sides="l"> </TD>
+      </TR>
+    </TABLE> >
+  ]
+
+  IOBufferData:data -> IOBuffer:start
+  IOBufferBlock:data:e -> IOBufferData:ne [dir=both,arrowhead=crow,arrowtail=odiamond,
+    taillabel="*",headlabel="1",
+    labelangle="90",labeldistance="1",labelfontcolor="red",color="red"
+  ]
+  IOBufferBlock:start:w -> IOBuffer:start
+  IOBufferBlock:end:w -> IOBuffer:end
+  IOBufferBlock:buf_end:e -> IOBuffer:buf_end
+}
