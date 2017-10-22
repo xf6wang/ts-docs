@@ -1,0 +1,58 @@
+digraph {
+
+  IOBufferBlock1 [shape=plaintext,label=< <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+      <TR><TD BGCOLOR="gold" port="name">\N</TD></TR>
+      <TR><TD port="start">start</TD></TR>
+      <TR><TD port="end">end</TD></TR>
+      <TR><TD port="buf_end">buf_end</TD></TR>
+      <TR><TD port="data">data</TD></TR>
+      </TABLE> >
+   ]
+
+  IOBufferBlock2 [shape=plaintext,label=< <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+      <TR><TD BGCOLOR="gold" port="name">\N</TD></TR>
+      <TR><TD port="start">start</TD></TR>
+      <TR><TD port="end">end</TD></TR>
+      <TR><TD port="buf_end">buf_end</TD></TR>
+      <TR><TD port="data">data</TD></TR>
+      </TABLE> >
+   ]
+
+  IOBufferData [shape=plaintext, label=< <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+      <TR><TD BGCOLOR="gold" port="name">\N</TD></TR>
+      <TR><TD port="data">data</TD></TR>
+      </TABLE> >
+   ]
+
+  IOBuffer [shape=plaintext, label=< <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+      <TR>
+        <TD BGCOLOR="gold">\N</TD>
+        <TD sides="l"> </TD>
+        <TD port="buf_start" BGCOLOR="grey"> </TD>
+        <TD port="start1" BGCOLOR="green"> </TD>
+        <TD BGCOLOR="green"> </TD>
+        <TD port="start2" BGCOLOR="blue:green" GRADIENTANGLE="90"> </TD>
+        <TD BGCOLOR="blue:green" GRADIENTANGLE="90"> </TD>
+        <TD BGCOLOR="blue:green" GRADIENTANGLE="90"> </TD>
+        <TD BGCOLOR="blue:green" GRADIENTANGLE="90"> </TD>
+        <TD BGCOLOR="blue:green" GRADIENTANGLE="90"> </TD>
+        <TD port="end"> </TD>
+        <TD> </TD>
+        <TD> </TD>
+        <TD> </TD>
+        <TD port="buf_end" sides="l"> </TD>
+      </TR>
+    </TABLE> >
+  ]
+
+  IOBufferData:data -> IOBuffer:buf_start
+  IOBufferBlock1:data:s -> IOBufferData:n [dir=both,arrowhead=crow,arrowtail=odiamond,color=red]
+  IOBufferBlock1:start:w -> IOBuffer:start1 [color="green"]
+  IOBufferBlock1:end:w -> IOBuffer:end [color="green"]
+  IOBufferBlock1:buf_end:w -> IOBuffer:buf_end [color="green"]
+
+  IOBufferBlock2:data:s -> IOBufferData:n [dir=both,arrowhead=crow,arrowtail=odiamond,color=red]
+  IOBufferBlock2:start:e -> IOBuffer:start2 [color="blue"]
+  IOBufferBlock2:end:e -> IOBuffer:end [color="blue"]
+  IOBufferBlock2:buf_end:e -> IOBuffer:buf_end [color="blue"]
+}

@@ -1,0 +1,40 @@
+@startuml
+
+hide empty members
+skinparam class {
+  BackgroundColor<<MEMORY>> #AADDFF
+}
+
+
+class MIOBuffer
+MIOBuffer : Ptr<IOBufferBlock> _writer
+MIOBuffer : IOBufferReader[MAX_IOBUFFER_READERS] readers
+
+class IOBufferReader {
+  MIOBuffer mbuf
+  Ptr<IOBufferBlock> block
+}
+
+class IOBufferBlock {
+  Ptr<IOBufferData> data
+  Ptr<IOBufferBlock> next
+}
+
+class IOBufferData {
+  void* _data
+}
+
+class IOBuffer << (M, #FFDDFF) MEMORY >>
+
+MIOBuffer *-- IOBufferReader : readers
+MIOBuffer o--{ IOBufferBlock : _writer
+
+IOBufferReader o-- MIOBuffer : mbuf
+IOBufferReader o--{ IOBufferBlock : block
+
+IOBufferBlock o--{ IOBufferBlock : next
+IOBufferBlock "+" o--{ "1" IOBufferData : data
+
+IOBufferData "1" o-r- "1" IOBuffer : "  _data  "
+
+@enduml

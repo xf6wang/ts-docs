@@ -1,0 +1,167 @@
+@startuml
+
+object MIOBuffer {
+  _writer = Block3
+  _reader[0] = Reader0
+}
+
+object Block0 {
+  refcount = 1
+  next = Block1
+}
+
+object Block1 {
+  refcount = 1
+  next = Block2
+}
+
+object Block2 {
+  refcount = 1
+  next = Block3
+}
+
+object Block3 {
+  refcount = 2
+  next = nullptr
+}
+
+object IOBufferReader {
+  mbuf = MIOBuffer
+  block = Block0
+}
+
+MIOBuffer -d-> Block3 : _writer
+IOBufferReader -d-> Block0
+Block0 -> Block1
+Block1 -> Block2
+Block2 -> Block3
+MIOBuffer "reader[0]" *-- "mbuf" IOBufferReader
+
+@enduml
+
+@startuml
+
+object MIOBuffer {
+  _writer = Block3
+  _reader[0] = Reader0
+}
+
+object Block0 {
+  refcount = 0
+  next = Block1
+}
+
+object Block1 {
+  refcount = 2
+  next = Block2
+}
+
+object Block2 {
+  refcount = 1
+  next = Block3
+}
+
+object Block3 {
+  refcount = 2
+  next = nullptr
+}
+
+object IOBufferReader {
+  mbuf = MIOBuffer
+  block = Block1
+}
+
+MIOBuffer -d-> Block3 : _writer
+IOBufferReader -d-> Block1
+Block0 -> Block1
+Block1 -> Block2
+Block2 -> Block3
+MIOBuffer "reader[0]" *-- "mbuf" IOBufferReader
+
+@enduml
+
+@startuml
+
+object MIOBuffer {
+  _writer = Block3
+  _reader[0] = Reader0
+}
+
+object Block1 {
+  refcount = 1
+  next = Block2
+}
+
+object Block2 {
+  refcount = 1
+  next = Block3
+}
+
+object Block3 {
+  refcount = 2
+  next = nullptr
+}
+
+object IOBufferReader {
+  mbuf = MIOBuffer
+  block = Block1
+}
+
+MIOBuffer -d-> Block3 : _writer
+IOBufferReader -d-> Block1
+Block1 -> Block2
+Block2 -> Block3
+MIOBuffer "reader[0]" *-- "mbuf" IOBufferReader
+
+@enduml
+
+@startuml
+
+object MIOBuffer {
+  _writer = Block0
+}
+
+object Block0 {
+  refcount = 1
+  next = nullptr
+}
+
+MIOBuffer -d-> Block0 : _writer
+
+@enduml
+
+@startuml
+
+object MIOBuffer {
+  _writer = Block1
+}
+
+object Block0 {
+  refcount = 0
+  next = Block1
+}
+
+object Block1 {
+  refcount = 2
+  next = nullptr
+}
+
+MIOBuffer -d-> Block1 : _writer
+Block0 -> Block1
+
+@enduml
+
+@startuml
+
+object MIOBuffer {
+  _writer = Block1
+}
+
+object Block1 {
+  refcount = 1
+  next = nullptr
+}
+
+MIOBuffer -d-> Block1 : _writer
+
+@enduml
