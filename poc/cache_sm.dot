@@ -1,0 +1,130 @@
+digraph cache {
+
+    node
+        [shape=Mrecord width=1.5];
+
+    subgraph cluster_Cache {
+
+        label="Cache";
+
+        //
+        // States (Nodes)
+        //
+
+        "Cache::idle"
+            [label="{idle}"];
+
+        "Cache::Finish"
+            [label="{Finish}"];
+
+        "Cache::open_write"
+            [label="{open_write}"];
+
+        "%start"
+            [label="" shape=circle style=filled fillcolor=black width=0.25];
+
+    }
+
+    subgraph cluster_Vol {
+
+        label="Vol";
+
+        //
+        // States (Nodes)
+        //
+
+    }
+
+    subgraph cluster_OpenDirEntry {
+
+        label="OpenDirEntry";
+
+        //
+        // States (Nodes)
+        //
+
+        "push(OpenDirEntry::Default)"
+            [label="" shape=plaintext];
+
+    }
+
+    subgraph cluster_CacheVC {
+
+        label="CacheVC";
+
+        //
+        // States (Nodes)
+        //
+
+        "CacheVC::openWriteStartBegin"
+            [label="{openWriteStartBegin}"];
+
+        "CacheVC::dummy"
+            [label="{dummy}"];
+
+        "CacheVC::openWriteInit"
+            [label="{openWriteInit}"];
+
+        "CacheVC::openWriteOverwrite"
+            [label="{openWriteOverwrite}"];
+
+        "CacheVC::pop(LOCK_READY)"
+            [label="" width=1]
+
+        "CacheVC::%end"
+            [label="" shape=doublecircle style=filled fillcolor=black width=0.15];
+
+        "CacheVC::openWriteStartBegin::CacheVC"
+            [label="{CacheVC|O-O\r}"]
+
+        "CacheVC::openWriteInit::OpenDirEntry"
+            [label="{OpenDirEntry|O-O\r}"]
+
+    }
+
+    //
+    // Transitions (Edges)
+    //
+
+    "Cache::idle" -> "Cache::open_write"
+        [label="Cache::open_write/\l"];
+
+    "Cache::open_write" -> "CacheVC::openWriteStartBegin"
+        [label="lock_failed/\l"];
+
+    "Cache::open_write" -> "CacheVC::openWriteOverwrite"
+        [label="overwrite/\l"];
+
+    "Cache::open_write" -> "CacheVC::openWriteInit"
+        [label="write/\l"];
+
+    "%start" -> "Cache::idle"
+
+    "push(OpenDirEntry::Default)" -> "OpenDirEntry::Default"
+        [arrowtail=odot];
+
+    "CacheVC::openWriteStartBegin" -> "CacheVC::openWriteStartBegin::CacheVC"
+        [label="unlocked/\lpush(dummy)\l"];
+
+    "CacheVC::openWriteStartBegin" -> "CacheVC::dummy"
+        [label="dummy/\l"];
+
+    "CacheVC::openWriteStartBegin" -> "CacheVC::openWriteInit"
+        [label="LOCK_READY/\l"];
+
+    "CacheVC::dummy" -> "CacheVC::pop(LOCK_READY)"
+        [label="lock/\l"];
+
+    "CacheVC::openWriteInit" -> "CacheVC::openWriteInit::OpenDirEntry"
+        [label="unlocked/\lpush(OpenDirEntry::Default)\l"];
+
+    "CacheVC::pop(LOCK_READY)" -> "CacheVC::%end"
+        [label="pop(LOCK_READY);\l"];
+
+    "CacheVC::openWriteStartBegin::CacheVC" -> "CacheVC::openWriteStartBegin"
+        [label="pop/"]
+
+    "CacheVC::openWriteInit::OpenDirEntry" -> "CacheVC::openWriteInit"
+        [label="pop/"]
+
+}
