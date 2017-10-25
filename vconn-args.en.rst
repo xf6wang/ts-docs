@@ -8,9 +8,9 @@ TSVConn Arguments
 
 To enable better Layer 4 routing it would be very helpful to be extend the transaction and session
 rguments to virtual connections. Plugins can then easily pass data from early intervention (layer 4)
-callbacks to transaction (layer 7) callbacks. For plugins such arguments are only needed to be
-attached to :code:`INKVConnInternal` and :code:`NetVConnection` as there aren't any other virtual
-connection types accessible from the plugin API.
+callbacks to transaction (layer 7) callbacks. For plugins such arguments only needto be attached to
+:code:`INKVConnInternal` and :code:`NetVConnection` as there aren't any other virtual connection
+types accessible from the plugin API.
 
 In terms of implementation the primary issue is adding a hook that a plugin can use to clean up
 resources. There are already sufficient early intervention hooks to set the data but both
