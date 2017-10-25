@@ -1,11 +1,15 @@
 @startuml
 
+box "Client Network" #LightBlue
 actor Client
 entity "Local VConn" as lvc
 participant "Inbound ATS" as inbound
 entity "Remote VConn" as rvc
+end box
+box "Corporate Network" #LightGreen
 participant "Outbound ATS" as outbound
 database Service
+end box
 
 Client -> inbound : TCP or TLS connect
 activate lvc
