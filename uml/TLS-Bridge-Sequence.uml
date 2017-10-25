@@ -1,0 +1,27 @@
+@startuml
+
+actor Client
+entity "Local VConn" as lvc
+participant "Inbound ATS" as inbound
+entity "Remote VConn" as rvc
+participant "Outbound ATS" as outbound
+database Service
+
+Client -> inbound : TCP or TLS connect
+activate lvc
+Client -> inbound : HTTP CONNECT
+inbound -> lvc : Intercept Transaction
+inbound -> outbound : TLS connect
+activate rvc
+note over inbound,outbound : Secure Tunnel
+inbound -> outbound : HTTP CONNECT
+note over outbound : DNS for Service is\ndone here.
+outbound -> Service : TCP Connect
+
+note over Client, Service : At this point data can flow between the Client and Server\nover the secure link as a virtual connection, including any TLS handshake.
+Client <--> Service
+lvc <-> inbound : <&arrow-thick-left> Move data <&arrow-thick-right>
+inbound <-> rvc : <&arrow-thick-left> Move data <&arrow-thick-right>
+note over inbound : Plugin explicitlys moves this data.
+
+@enduml

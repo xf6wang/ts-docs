@@ -11,7 +11,7 @@ JAVA          = java
 
 SBUILD = $(SPHINXBUILD) ${PAPEROPT_letter}
 PLANTUML = $(JAVA) -jar ~/bin/plantuml.jar
-IMAGEDIR = $(srcdir)/docbuild/html/_images
+IMAGEDIR = $(srcdir)/images
 UMLDIR = $(srcdir)/uml
 
 $(IMAGEDIR)/%.png : $(UMLDIR)/%.uml
@@ -28,7 +28,9 @@ html: uml
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
-uml: $(IMAGEDIR)/ts-projects.png
+uml: $(IMAGEDIR)/ts-projects.png\
+	 $(IMAGEDIR)/TLS-Bridge-Structure.png\
+	 $(IMAGEDIR)/TLS-Bridge-Sequence.png
 
 dirhtml:
 	$(SBUILD) -d $(BUILDDIR)/doctrees -b dirhtml $(srcdir) $(BUILDDIR)/html

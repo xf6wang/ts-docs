@@ -1,0 +1,16 @@
+@startuml
+
+hide empty members
+
+cloud "Cloud\nUntrusted\nNetworks" as Cloud
+node "Inbound ATS"
+node "Outbound ATS"
+
+[Client] <--> [Inbound ATS] : Unsecure
+[Inbound ATS] <-> [Cloud] : Secure
+[Cloud] <-> [Outbound ATS] : Secure
+[Outbound ATS] <-u-> [Service] : Unsecure
+
+[Inbound ATS] ..> [TLS_Bridge\nPlugin] : Uses
+
+@enduml
