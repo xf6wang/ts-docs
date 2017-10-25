@@ -22,6 +22,7 @@ Projects
    errata.en
    body-factory.en
    tls-bridge.en
+   vconn-args.en
 
 ======================
 Less Detailed Projects
@@ -212,3 +213,11 @@ The main difficulty for this is handling the cache. To some extent the cache wou
 multi-process. To make this more feasible the access would be single writer and the control of
 writing would pass from the old process to the new process. This may mean terminating cache writes
 in the old process.
+
+.. Files referenced but not to be in a TOC.
+
+.. toctree::
+   :hidden:
+
+   api/TSVConnArgs.en
+
