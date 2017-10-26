@@ -14,9 +14,9 @@ types accessible from the plugin API.
 
 In terms of implementation the primary issue is adding a hook that a plugin can use to clean up
 resources. There are already sufficient early intervention hooks to set the data but both
-:code:`TS_HTTP_TXN_CLOSE` and :code:`TS_HTTP_SSN_CLOSE` hooks are insufficient in case of error
-before the client session is constructed. A new hook, :code:`TS_VCONN_CLOSE`, is needed to do this
-cleanup. We should rename :code:`TS_VCONN_PRE_ACCEPT_HOOK` to :code:`TS_VCONN_START`.
+:code:`TS_HTTP_TXN_CLOSE_HOOK` and :code:`TS_HTTP_SSN_CLOSE_HOOK` hooks are insufficient in case of
+error before the client session is constructed. A new hook, :code:`TS_VCONN_CLOSE`, is needed to do
+this cleanup. We should rename :code:`TS_VCONN_PRE_ACCEPT_HOOK` to :code:`TS_VCONN_START_HOOK`.
 
 In terms of implementation we would add a :code:`std::vector` to a class which would be inherited by
 :class:`INKVConnInternal` and :class:`NetVConnection`. This has a size of 24 bytes default

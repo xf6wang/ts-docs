@@ -1,0 +1,56 @@
+@startuml
+
+legend
+Host Lookup (Action Example)
+endlegend
+
+actor Plugin
+participant TSAPI
+entity contp
+
+== Immediate Response ==
+Plugin -\ TSAPI : TSHostLookup
+TSAPI -\ contp : TS_EVENT_HOST_LOOKUP
+activate TSAPI
+note over contp : Clear saved Action
+contp -\ TSAPI : TSHttpTxnReenable
+activate TSAPI
+TSAPI -/ contp : return
+deactivate TSAPI
+contp -/ TSAPI : return
+TSAPI -/ Plugin : return ACTION_RESULT_DONE
+deactivate TSAPI
+
+== Delayed Response ==
+Plugin -\ TSAPI : TSHostLookup
+TSAPI -/ Plugin : Action
+note over Plugin : Save Action
+... Wait for DNS ...
+TSAPI -\ contp : TS_EVENT_HOST_LOOKUP
+note over contp : Clear saved Action
+contp -/ TSAPI : TSHttpTxnReenable
+
+@enduml
+
+@startuml
+
+legend
+Host Lookup (Error Example)
+endlegend
+
+== Error Case ==
+actor Plugin
+participant TSAPI
+entity contp
+
+Plugin -\ TSAPI : TSHostLookup
+activate TSAPI
+TSAPI -/ Plugin : Action
+deactivate TSAPI
+note over Plugin : Save Action
+... Wait for DNS ...
+[-> Plugin : Error event
+Plugin -> TSAPI : TSCancel(Action)
+Plugin -> TSAPI : TSDestroyCont(contp)
+
+@enduml

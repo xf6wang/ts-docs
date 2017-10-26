@@ -30,7 +30,8 @@ html: uml
 
 uml: $(IMAGEDIR)/ts-projects.png\
 	 $(IMAGEDIR)/TLS-Bridge-Structure.png\
-	 $(IMAGEDIR)/TLS-Bridge-Sequence.png
+	 $(IMAGEDIR)/TLS-Bridge-Sequence.png\
+	 $(IMAGEDIR)/ts-api-action.png
 
 dirhtml:
 	$(SBUILD) -d $(BUILDDIR)/doctrees -b dirhtml $(srcdir) $(BUILDDIR)/html
