@@ -1,0 +1,32 @@
+@startuml
+
+(*) --> "Cancel Trigger"
+if "vol_idx" then
+-->[>= nvols] "Reset state"
+  if "event ==" then
+    -->[EVENT_INTERVAL] "Schedule on event thread"
+    --> (*)
+  else
+    -->[ *] "Schedule on EventProcessor"
+  endif
+else
+  -->[<nvols] "Select volume"
+endif
+
+if "event ==" then
+  -->[AIO_EVENT_DONE] "Schedule on EventProcessor"
+else
+  -->[ *] if "writepos ==" then
+    -->[0] if "io_in_progress" then
+      --> (*)
+    endif
+    if "agg_buf_pos" then
+      --> "AggWrite"
+      --> (*)
+  endif
+endif
+
+
+"Schedule on EventProcessor" --> (*)
+
+@enduml
