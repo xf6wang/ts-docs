@@ -50,11 +50,13 @@ extensions = [ 'sphinx.ext.graphviz'
              , 'sphinx.ext.imgmath'
              , 'sphinx.ext.viewcode'
              , 'sphinx.ext.githubpages'
+             , 'sphinxcontrib.plantuml'
              , 'local'
              ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
+plantuml = 'java -jar /home/amc/bin/plantuml.jar'
 
 # The suffix of source filenames.
 source_suffix = '.rst'

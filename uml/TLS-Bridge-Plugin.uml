@@ -1,0 +1,19 @@
+@startuml
+
+actor Plugin
+entity "UA VConn" as lvc
+entity "Outbound VConn" as rvc
+entity "Out Write VIO" as ow_vio
+participant "TS Core" as core
+participant "Outbound ATS" as outbound
+
+Plugin -> core : ""TSHttpTxnIntercept""
+activate lvc
+Plugin -> core : ""TSHttpConnect""
+activate rvc
+Plugin -> rvc : ""TSVConnWrite""
+note right : CONNECT to Outbound ATS
+Plugin -> ow_vio : ""TSVIOReenable""
+core -> rvc : ""200 OK""
+
+@enduml

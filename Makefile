@@ -2,7 +2,6 @@
 
 .PHONY: help dirhtml singlehtml
 
-BUILDDIR=.
 srcdir=.
 SPHINXBUILD=sphinx-build
 PAPER         = letter
@@ -11,7 +10,8 @@ JAVA          = java
 
 SBUILD = $(SPHINXBUILD) ${PAPEROPT_letter}
 PLANTUML = $(JAVA) -jar ~/bin/plantuml.jar
-IMAGEDIR = $(srcdir)/images
+IMAGEDIR = $(srcdir)/pix
+BUILD_IMAGEDIR = $(BUILDDIR)/html/_images
 UMLDIR = $(srcdir)/uml
 
 $(IMAGEDIR)/%.png : $(UMLDIR)/%.uml
@@ -23,16 +23,18 @@ help:
 	@echo "  dirhtml    to make HTML files named index.html in directories"
 	@echo "  singlehtml to make a single large HTML file"
 
-html: uml
+html: uml $(BUILD_IMAGEDIR)/ts-projects.png
 	$(SBUILD) -d $(BUILDDIR)/doctrees -b html $(srcdir) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
 uml: $(IMAGEDIR)/ts-projects.png\
 	 $(IMAGEDIR)/TLS-Bridge-Structure.png\
-	 $(IMAGEDIR)/TLS-Bridge-Sequence.png\
 	 $(IMAGEDIR)/ts-api-action.png\
 	 $(IMAGEDIR)/cache-dir-sync.png
+
+$(BUILD_IMAGEDIR)/ts-projects.png: $(IMAGEDIR)/ts-projects.png
+	cp $(IMAGEDIR)/ts-projects.png $(BUILD_IMAGEDIR)
 
 dirhtml:
 	$(SBUILD) -d $(BUILDDIR)/doctrees -b dirhtml $(srcdir) $(BUILDDIR)/html

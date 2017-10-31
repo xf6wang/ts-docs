@@ -16,7 +16,7 @@ Description
 
 The tunnel is sustained by two instances of |TS|.
 
-.. image:: images/TLS-Bridge-Structure.png
+.. image:: pix/TLS-Bridge-Structure.png
    :align: center
 
 The inbound |TS| accepts a connection from the Client. This connection gets intercepted by the
@@ -46,5 +46,12 @@ sent to the outbound |TS|. This will result in blind tunnels in both the inbound
 instances giving the client a byte level secured connection to the service. Note there is no plugin
 in the outbound |TS| - it only needs to be configured appropriately.
 
-.. image:: images/TLS-Bridge-Sequence.png
+The overall exchange looks like the following.
+
+.. uml:: uml/TLS-Bridge-Sequence.uml
+   :align: center
+
+A detailed view of the plugin operation.
+
+.. uml:: uml/TLS-Bridge-Plugin.uml
    :align: center
