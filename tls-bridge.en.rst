@@ -55,6 +55,17 @@ A detailed view of the plugin operation.
 .. uml:: uml/TLS-Bridge-Plugin.uml
    :align: center
 
-A sequence diagram focusing on the request / response data flow.
+A sequence diagram focusing on the request / response data flow. There is a :code:`NetVConn` for the
+connection to the Peer |TS| which is omitted for clarity.
+
+*  Blue dotted lines are request or response data
+*  Green lines are network connections.
+*  Red lines are programmatic interactions.
+*  Black lines are hook call backs.
+
+The :code:`200 OK` sent from the Peer |TS| is parsed and consumed by the plugin. An non-:code:`200` response
+means there was an error and the tunnel is shut down. To deal with the Client response clean up the
+response code is stored and used later during cleanup.
 
 .. uml:: uml/TLS-Bridge-Messages.uml
+   :align: center

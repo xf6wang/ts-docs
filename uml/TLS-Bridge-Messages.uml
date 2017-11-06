@@ -8,18 +8,22 @@ entity "Client\nVConn" as uavc
 entity "TLS Bridge" as plugin
 entity "Peer\nVConn" as peervc
 end box
+box "Peer ATS" #EEEEFF
 participant "Peer\nATS" as peer
+end box
 participant Service
 
-Client -> ingress : //TCP Connect//
+Client <-[#green]> ingress : //TCP Connect//
 activate uanet
-Client -[#blue]-> uanet : ""CONNECT"" Service
+Client -[#blue]-> uanet : <font color="blue">""CONNECT"" Service</font>
 uanet -> ingress : //Parse request//
-ingress -> plugin : //READ_REQUEST_HDR_HOOK//
+ingress -[#black]> plugin : ""READ_REQUEST_HDR_HOOK""
 plugin -> ingress : //TSHttpTxnIntercept()//
 ingress -> uavc : //Create//
 activate uavc
-ingress -> plugin : //TS_EVENT_NET_ACCEPT//
+uanet -[#blue]-> ingress : <font color="blue">""CONNECT"" Service</font>
+ingress -[#blue]-> uavc : <font color="blue">""CONNECT"" Service</font>
+ingress -[#black]> plugin : ""TS_EVENT_NET_ACCEPT""
 note right : Client VConn is passed in event data.
 
 plugin -\ ingress : //TSHttpConnect()//
@@ -27,16 +31,38 @@ ingress -> peervc : //create//
 activate peervc
 ingress -/ plugin : //return Peer VConn//
 
-plugin -[#blue]-> peervc : ""CONNECT"" Peer
+plugin -[#blue]-> peervc : <font color="blue">""CONNECT"" Peer</font>
 peervc -> ingress : //parse request//
-ingress -> peer : //TLS Connect//
-ingress -[#blue]-> peervc : ""200 OK""
-peervc -[#blue]-> plugin : ""200 OK""
-note left : This signals a raw TLS connection\nto the Peer ATS
+ingress <-[#green]> peer : //TLS Connect//
+ingress -[#blue]-> peervc : <font color="blue">""200 OK""</font>
+peervc -[#blue]-> plugin : <font color="blue">""200 OK""</font>
+note left
+This signals a raw TLS connection
+nto the Peer ATS. The response is
+parsed and consumed by Plugin.
+end note
 
-plugin -[#blue]-> peervc : ""CONNECT"" Service
-note right : Original Client Request.
-peervc -[#blue]-> peer : ""CONNECT"" Service
-peer -> Service : //TCP/TLS Connect//
-peer -[#blue]-> peervc : ""200 OK""
+note over plugin : Plugin switches to byte forwarding.
+uavc -[#blue]-> plugin : <font color="blue">""CONNECT"" Service</font>
+note left: Original Client Request.
+plugin -[#blue]-> peervc : <font color="blue">""CONNECT"" Service</font>
+peervc -[#blue]-> peer : <font color="blue">""CONNECT"" Service</font>
+peer <-[#green]> Service : //TCP/TLS Connect//
+peer -[#blue]-> peervc : <font color="blue">""200 OK""</font>
+peervc -[#blue]-> plugin : <font color="blue">""200 OK""</font>
+plugin -[#blue]-> uavc : <font color="blue">""200 OK""</font>
+uavc -[#blue]-> ingress : <font color="blue">""200 OK""</font>
+note left
+ATS updates the incoming response based on
+local configuration. This means what goes out
+to the Client may be different than what the
+plugin wrote (forwarded from Peer ATS).
+end note
+ingress -[#black]> plugin : ""SEND_RESPONSE_HDR_HOOK""
+note right : Plugin cleans up response here.
+ingress -[#blue]-> uanet : <font color="blue">""200 OK""</font>
+uanet -[#blue]-> Client : <font color="blue">""200 OK""</font>
+
+Client <-[#green]> Service : //TCP/TLS Connect//
+
 @enduml

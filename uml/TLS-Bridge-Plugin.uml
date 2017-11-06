@@ -63,4 +63,10 @@ FlowToClient --> Tunnel
 Tunnel --> FlowToPeer : ""TS_EVENT_VCONN_READY_READY""\nClient VIO
 FlowToPeer --> Tunnel
 
+Tunnel -right-> Shutdown : ""TS_EVENT_VCONN_EOS""
+
+Shutdown : Close Client VConn
+Shutdown : =====
+Shutdown : Close Upstream VConn
+
 @enduml
