@@ -2,30 +2,30 @@
 
 box "Client Network" #EEFFEE
 actor Client
-entity "Local VConn" as lvc
-participant "Inbound ATS" as inbound
-entity "Remote VConn" as rvc
+entity "User Agent\nVConn" as lvc
+participant "Ingress ATS" as ingress
+entity "Upstream\nVConn" as rvc
 end box
 box "Corporate Network" #EEEEFF
-participant "Outbound ATS" as outbound
+participant "Peer ATS" as peer
 database Service
 end box
 
-Client -> inbound : TCP or TLS connect
+Client -> ingress : TCP or TLS connect
 activate lvc
-Client -> inbound : HTTP CONNECT
-inbound -> lvc : Intercept Transaction
-inbound -> outbound : TLS connect
+Client -> ingress : HTTP CONNECT
+ingress -> lvc : Intercept Transaction
+ingress -> peer : TLS connect
 activate rvc
-note over inbound,outbound : Secure Tunnel
-inbound -> outbound : HTTP CONNECT
-note over outbound : DNS for Service is\ndone here.
-outbound -> Service : TCP Connect
+note over ingress,peer : Secure Tunnel
+ingress -> peer : HTTP CONNECT
+note over peer : DNS for Service is\ndone here.
+peer -> Service : TCP Connect
 
 note over Client, Service : At this point data can flow between the Client and Server\nover the secure link as a virtual connection, including any TLS handshake.
 Client <--> Service
-lvc <-> inbound : <&arrow-thick-left> Move data <&arrow-thick-right>
-inbound <-> rvc : <&arrow-thick-left> Move data <&arrow-thick-right>
-note over inbound : Plugin explicitlys moves this data.
+lvc <-> ingress : <&arrow-thick-left> Move data <&arrow-thick-right>
+ingress <-> rvc : <&arrow-thick-left> Move data <&arrow-thick-right>
+note over ingress : Plugin explicitlys moves this data.
 
 @enduml

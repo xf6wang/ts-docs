@@ -29,7 +29,6 @@ html: uml $(BUILD_IMAGEDIR)/ts-projects.png
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
 uml: $(IMAGEDIR)/ts-projects.png\
-	 $(IMAGEDIR)/TLS-Bridge-Structure.png\
 	 $(IMAGEDIR)/ts-api-action.png\
 	 $(IMAGEDIR)/cache-dir-sync.png
 

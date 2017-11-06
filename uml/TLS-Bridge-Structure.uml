@@ -3,14 +3,14 @@
 hide empty members
 
 cloud "Cloud\nUntrusted\nNetworks" as Cloud
-node "Inbound ATS"
-node "Outbound ATS"
+node "Ingress ATS"
+node "Peer ATS"
 
-[Client] <--> [Inbound ATS] : Unsecure
-[Inbound ATS] <-> [Cloud] : Secure
-[Cloud] <-> [Outbound ATS] : Secure
-[Outbound ATS] <-u-> [Service] : Unsecure
+[Client] <--> [Ingress ATS] : Unsecure
+[Ingress ATS] <-> [Cloud] : Secure
+[Cloud] <-> [Peer ATS] : Secure
+[Peer ATS] <-u-> [Service] : Unsecure
 
-[Inbound ATS] ..> [TLS_Bridge\nPlugin] : Uses
+[Ingress ATS] ..> [tls_bridge\nPlugin] : Uses
 
 @enduml

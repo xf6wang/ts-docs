@@ -1,0 +1,42 @@
+@startuml
+
+actor Client
+box "Ingress ATS" #EEFFEE
+entity "Client\nNetVConn" as uanet
+participant "Ingress\nATS" as ingress
+entity "Client\nVConn" as uavc
+entity "TLS Bridge" as plugin
+entity "Peer\nVConn" as peervc
+end box
+participant "Peer\nATS" as peer
+participant Service
+
+Client -> ingress : //TCP Connect//
+activate uanet
+Client -[#blue]-> uanet : ""CONNECT"" Service
+uanet -> ingress : //Parse request//
+ingress -> plugin : //READ_REQUEST_HDR_HOOK//
+plugin -> ingress : //TSHttpTxnIntercept()//
+ingress -> uavc : //Create//
+activate uavc
+ingress -> plugin : //TS_EVENT_NET_ACCEPT//
+note right : Client VConn is passed in event data.
+
+plugin -\ ingress : //TSHttpConnect()//
+ingress -> peervc : //create//
+activate peervc
+ingress -/ plugin : //return Peer VConn//
+
+plugin -[#blue]-> peervc : ""CONNECT"" Peer
+peervc -> ingress : //parse request//
+ingress -> peer : //TLS Connect//
+ingress -[#blue]-> peervc : ""200 OK""
+peervc -[#blue]-> plugin : ""200 OK""
+note left : This signals a raw TLS connection\nto the Peer ATS
+
+plugin -[#blue]-> peervc : ""CONNECT"" Service
+note right : Original Client Request.
+peervc -[#blue]-> peer : ""CONNECT"" Service
+peer -> Service : //TCP/TLS Connect//
+peer -[#blue]-> peervc : ""200 OK""
+@enduml
