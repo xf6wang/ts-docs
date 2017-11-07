@@ -69,3 +69,52 @@ response code is stored and used later during cleanup.
 
 .. uml:: uml/TLS-Bridge-Messages.uml
    :align: center
+
+Configuration
+=============
+
+|Name| requires 2 instances of |TS| (Ingress and Peer) and a MicroServer instance.
+
+#. Disable caching on |TS| in ``records.config``::
+
+      CONFIG proxy.config.http.cache.http INT 0
+
+#. Configure the ports.
+
+   *  The Peer |TS| must be listening on an SSL enabled proxy port. For instance, if the proxy port for the Peer is 4443, then configuration in ``records.config`` would have::
+
+         CONFIG proxy.config.http.server_ports STRING 4443:ssl
+
+   *  The Ingress |TS| must allow ``CONNECT`` to the Peer proxy port. This would be set in ``records.config`` by::
+
+         CONFIG proxy.config.http.connect_ports STRING 4443
+
+      The Ingress |TS| also needs ``proxy.config.http.server_ports`` configured to have proxy ports
+      to which the Client can connect.
+
+#. Remap is not required, however, |TS| requires remap in order to accept the request. This can be done by disabling the remap requirement::
+
+      CONFIG proxy.config.url_remap.remap_required INT 0
+
+   In this case |TS| will act as an open proxy which is unlikely to be a good idea. |TS| will need
+   to run in a restricted environment or use access control (via ``ip_allow.config`` or
+   ``iptables``).
+
+#. Configure the Ingress |TS| to verify the Peer server certificate::
+
+      CONFIG proxy.config.ssl.client.verify.server INT 1
+
+#. Configure Certificate Authority used by the Ingress |TS| to verify the Peer server certificate. If this
+   is a directory all of the certificates in the directory are treated as Certificate Authorites. ::
+
+      CONFIG proxy.config.ssl.client.CA.cert.filename STRING </path/to/CA_certificate_file_name>
+
+#. Configure the Ingress |TS| to provide a client certificate::
+
+      CONFIG proxy.config.ssl.client.cert.path STRING </path/to/certificate/dir>
+      CONFIG proxy.config.ssl.client.cert.filename STRING <server_certificate_file_name>
+
+#. Configure the Peer |TS| to verify the Ingress client certificate::
+
+      CONFIG proxy.config.ssl.client.certification_level INT 2
+      
