@@ -25,6 +25,7 @@ Reference
 .. toctree::
    :maxdepth: 1
 
+   reference.en
    guide.en
    completed.en
 
