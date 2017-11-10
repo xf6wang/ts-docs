@@ -50,5 +50,5 @@ clean:
 	-rm -rf html warn.log
 	-rm -rf $(BUILDDIR)/doctrees $(BUILDDIR)/html $(BUILDDIR)/dirhtml $(BUILDDIR)/singlehtml
 
-publish: clean
+publish: clean html
 	$(SHELL) ./publish.sh
