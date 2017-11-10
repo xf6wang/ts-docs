@@ -33,47 +33,10 @@ names are URLs which will in the original HTTP request made by the Client after 
 ingress |TS|. This means the FQDN for the Service is not resolved in the environment of the peer
 |TS| and not the ingress |TS|.
 
-Implementation
-==============
-
-The |Name| plugin uses :code:`TSHttpTxnIntercept` to gain control of the ingress Client session.
-If the session is valid then a separate connection to the peer |TS| is created using
-:code:`TSHttpConnect`.
-
-After the ingress |TS| connects to the peer |TS| it sends a duplicate of the Client ``CONNECT``
-request. This is processed by the peer |TS| to connect on to the Service. After this both |TS|
-instances then tunnel data between the Client and the Service, in effect becoming a transparent
-tunnel.
-
-The overall exchange looks like the following:
-
-.. uml:: uml/TLS-Bridge-Sequence.uml
-   :align: center
-
-A detailed view of the plugin operation.
-
-.. uml:: uml/TLS-Bridge-Plugin.uml
-   :align: center
-
-A sequence diagram focusing on the request / response data flow. There is a :code:`NetVConn` for the
-connection to the Peer |TS| which is omitted for clarity.
-
-*  Blue dotted lines are request or response data
-*  Green lines are network connections.
-*  Red lines are programmatic interactions.
-*  Black lines are hook call backs.
-
-The :code:`200 OK` sent from the Peer |TS| is parsed and consumed by the plugin. An non-:code:`200` response
-means there was an error and the tunnel is shut down. To deal with the Client response clean up the
-response code is stored and used later during cleanup.
-
-.. uml:: uml/TLS-Bridge-Messages.uml
-   :align: center
-
 Configuration
 =============
 
-|Name| requires 2 instances of |TS| (Ingress and Peer) and a MicroServer instance.
+|Name| requires at least two instances of |TS| (Ingress and Peer).
 
 #. Disable caching on |TS| in ``records.config``::
 
@@ -117,4 +80,50 @@ Configuration
 #. Configure the Peer |TS| to verify the Ingress client certificate::
 
       CONFIG proxy.config.ssl.client.certification_level INT 2
-      
+
+#. Enable the |Name| plugin in ``plugin.config``. The plugin is configured by arguments in
+   ``plugin.config``. These are arguments are in pairs of a *destination* and a *peer*. The
+   destination is a anchored regular expression which is matched against the host name in the Client
+   ``CONNECT``. The destinations are checked in order and the first match is used to select the Peer
+   |TS|. The peer should be an FQDN or IP address with an optional port. For the example above, if
+   the Peer |TS| was named "peer.example.com" on port 4443 and the Service at ``*.service.com``, the
+   peer argument would be "peer.example.com:4443". In ``plugin.config`` this would be::
+
+      tls_bridge.so .*[.]service[.]com peer.example.com:4443
+
+Implementation
+==============
+
+The |Name| plugin uses :code:`TSHttpTxnIntercept` to gain control of the ingress Client session.
+If the session is valid then a separate connection to the peer |TS| is created using
+:code:`TSHttpConnect`.
+
+After the ingress |TS| connects to the peer |TS| it sends a duplicate of the Client ``CONNECT``
+request. This is processed by the peer |TS| to connect on to the Service. After this both |TS|
+instances then tunnel data between the Client and the Service, in effect becoming a transparent
+tunnel.
+
+The overall exchange looks like the following:
+
+.. uml:: uml/TLS-Bridge-Sequence.uml
+   :align: center
+
+A detailed view of the plugin operation.
+
+.. uml:: uml/TLS-Bridge-Plugin.uml
+   :align: center
+
+A sequence diagram focusing on the request / response data flow. There is a :code:`NetVConn` for the
+connection to the Peer |TS| which is omitted for clarity.
+
+*  Blue dotted lines are request or response data
+*  Green lines are network connections.
+*  Red lines are programmatic interactions.
+*  Black lines are hook call backs.
+
+The :code:`200 OK` sent from the Peer |TS| is parsed and consumed by the plugin. An non-:code:`200` response
+means there was an error and the tunnel is shut down. To deal with the Client response clean up the
+response code is stored and used later during cleanup.
+
+.. uml:: uml/TLS-Bridge-Messages.uml
+   :align: center

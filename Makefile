@@ -33,6 +33,7 @@ uml: $(IMAGEDIR)/ts-projects.png\
 	 $(IMAGEDIR)/cache-dir-sync.png
 
 $(BUILD_IMAGEDIR)/ts-projects.png: $(IMAGEDIR)/ts-projects.png
+	@mkdir -p $(BUILD_IMAGEDIR)
 	cp $(IMAGEDIR)/ts-projects.png $(BUILD_IMAGEDIR)
 
 dirhtml:
@@ -49,5 +50,5 @@ clean:
 	-rm -rf html warn.log
 	-rm -rf $(BUILDDIR)/doctrees $(BUILDDIR)/html $(BUILDDIR)/dirhtml $(BUILDDIR)/singlehtml
 
-publish:
+publish: clean
 	$(SHELL) ./publish.sh
