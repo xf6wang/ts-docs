@@ -4,6 +4,37 @@
 Cache Logic / Operations
 ************************
 
+Cache Startup
+=============
+
+.. uml::
+
+   @startuml
+
+   hide empty members
+   hide empty methods
+   skinparam defaultTextAlignment left
+
+   class CacheProcessor
+   class DiskInit
+   class CacheDisk
+   class VolInit
+   class Vol
+
+   CacheProcessor --> DiskInit : //create//
+   DiskInit --> CacheDisk : [1] open()
+   note on link : Start I/O for Span Header
+   CacheDisk --> CacheDisk : [2] openStart()
+   note on link : Validate Span Header
+   CacheDisk -d-> CacheDisk : [3] openDone()
+   CacheDisk --> CacheProcessor : [4] diskInitialized()
+
+   CacheProcessor --> Cache : [5] open()
+   Cache --> VolInit : [6] mainEvent()
+   VolInit --> Vol : [7] init()
+
+   @enduml
+
 State machine.
 
 .. graphviz:: cache_sm.dot
@@ -43,5 +74,3 @@ tend to be less closely coupled to HTTP state machine instances.
 
 Write Operations
 ================
-
-
