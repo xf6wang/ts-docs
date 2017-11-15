@@ -1,14 +1,14 @@
 @startuml
 
 actor Client
-box "Ingress ATS" #EEFFEE
+box "Ingress ATS" #DDFFDD
 entity "Client\nNetVConn" as uanet
 participant "Ingress\nATS" as ingress
 entity "Client\nVConn" as uavc
 entity "TLS Bridge" as plugin
 entity "Peer\nVConn" as peervc
 end box
-box "Peer ATS" #EEEEFF
+box "Peer ATS" #DDDDFF
 participant "Peer\nATS" as peer
 end box
 participant Service

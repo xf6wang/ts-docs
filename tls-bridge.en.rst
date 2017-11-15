@@ -105,8 +105,41 @@ tunnel.
 
 The overall exchange looks like the following:
 
-.. uml:: uml/TLS-Bridge-Sequence.uml
+.. uml::
    :align: center
+
+   @startuml
+
+   box "Client Network" #DDFFDD
+   actor Client
+   entity "User Agent\nVConn" as lvc
+   participant "Ingress ATS" as ingress
+   entity "Upstream\nVConn" as rvc
+   end box
+   box "Corporate Network" #DDDDFF
+   participant "Peer ATS" as peer
+   database Service
+   end box
+
+   Client -> ingress : TCP or TLS connect
+   activate lvc
+   Client -> ingress : HTTP CONNECT
+   ingress -> lvc : Intercept Transaction
+   ingress -> peer : TLS connect
+   activate rvc
+   note over ingress,peer : Secure Tunnel
+   ingress -> peer : HTTP CONNECT
+   note over peer : DNS for Service is\ndone here.
+   peer -> Service : TCP Connect
+
+   note over Client, Service : At this point data can flow between the Client and Server\nover the secure link as a virtual connection, including any TLS handshake.
+   Client <--> Service
+   lvc <-> ingress : <&arrow-thick-left> Move data <&arrow-thick-right>
+   ingress <-> rvc : <&arrow-thick-left> Move data <&arrow-thick-right>
+   note over ingress : Plugin explicitlys moves this data.
+
+   @enduml
+
 
 A detailed view of the plugin operation.
 
@@ -127,3 +160,24 @@ response code is stored and used later during cleanup.
 
 .. uml:: uml/TLS-Bridge-Messages.uml
    :align: center
+
+A restartable state machine is used to recognize the end of the Peer |TS| response. The initial part
+of the response is easy because all that is needed is to wait until there is sufficient data for a
+minimal parse. The end can be an arbitrary distance in to the stream and may not all be in the same
+socket read.
+
+.. uml::
+   :align: center
+
+   @startuml
+   [*] -r> State_0
+   State_0 --> State_1 : CR
+   State_1 --> State_0 : *
+   State_1 --> State_1 : CR
+   State_1 --> State_2 : LF
+   State_2 --> State_3 : CR
+   State_2 --> State_0 : *
+   State_3 -r> [*] : LF
+   State_3 --> State_1 : CR
+   State_3 --> State_0 : *
+   @enduml
