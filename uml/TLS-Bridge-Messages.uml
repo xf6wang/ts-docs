@@ -15,7 +15,7 @@ participant Service
 
 Client <-[#green]> ingress : //TCP Connect//
 activate uanet
-Client -[#blue]-> uanet : <font color="blue">""CONNECT"" Service</font>
+
 uanet -> ingress : //Parse request//
 ingress -[#black]> plugin : ""READ_REQUEST_HDR_HOOK""
 plugin -> ingress : //TSHttpTxnIntercept()//
