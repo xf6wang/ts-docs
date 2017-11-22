@@ -13,9 +13,9 @@ participant "Peer\nATS" as peer
 end box
 participant Service
 
-Client <-[#green]> ingress : //TCP Connect//
+Client <-[#green]> ingress : <font color="green">//TCP//</font> Handshake
 activate uanet
-
+Client -[#blue]-> uanet : <font color="blue">""CONNECT"" Service</font>
 uanet -> ingress : //Parse request//
 ingress -[#black]> plugin : ""READ_REQUEST_HDR_HOOK""
 plugin -> ingress : //TSHttpTxnIntercept()//
@@ -33,7 +33,8 @@ ingress -/ plugin : //return Peer VConn//
 
 plugin -[#blue]-> peervc : <font color="blue">""CONNECT"" Peer</font>
 peervc -> ingress : //parse request//
-ingress <-[#green]> peer : //TLS Connect//
+ingress <-[#green]> peer : <font color="green">//TCP//</font> Handshake
+ingress <-[#green]> peer : <font color="green">//TLS//</font> Handshake
 ingress -[#blue]-> peervc : <font color="blue">""200 OK""</font>
 peervc -[#blue]-> plugin : <font color="blue">""200 OK""</font>
 note left
@@ -47,7 +48,9 @@ uavc -[#blue]-> plugin : <font color="blue">""CONNECT"" Service</font>
 note left: Original Client Request.
 plugin -[#blue]-> peervc : <font color="blue">""CONNECT"" Service</font>
 peervc -[#blue]-> peer : <font color="blue">""CONNECT"" Service</font>
-peer <-[#green]> Service : //TCP/TLS Connect//
+peer <-[#green]> Service : <font color="green">//TCP//</font> Handshake
+peer <-[#green]> Service : <font color="green">//TLS//</font> Handshake
+note left : Optional, based on 'Service'
 peer -[#blue]-> peervc : <font color="blue">""200 OK""</font>
 peervc -[#blue]-> plugin : <font color="blue">""200 OK""</font>
 plugin -[#blue]-> uavc : <font color="blue">""200 OK""</font>
