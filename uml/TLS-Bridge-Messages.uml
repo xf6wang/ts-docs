@@ -1,5 +1,7 @@
 @startuml
 
+scale max 720 width
+
 actor Client
 box "Ingress ATS" #DDFFDD
 entity "Client\nNetVConn" as uanet

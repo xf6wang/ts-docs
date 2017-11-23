@@ -17,6 +17,9 @@ UMLDIR = $(srcdir)/uml
 $(IMAGEDIR)/%.png : $(UMLDIR)/%.uml
 	$(PLANTUML) $< -o $(shell realpath $(IMAGEDIR))
 
+$(IMAGEDIR)/%.svg : $(UMLDIR)/%.uml
+	$(PLANTUML) $< -tsvg -o $(shell realpath $(IMAGEDIR))
+
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo "  html       to make standalone HTML files"

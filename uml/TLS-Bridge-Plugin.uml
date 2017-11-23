@@ -1,5 +1,7 @@
 @startuml
 
+scale max 720 width
+
 ReadRequestHdr : Check for ""CONNECT""
 ReadRequestHdr : =====
 ReadRequestHdr : Find Peer for Service.
