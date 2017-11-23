@@ -16,8 +16,22 @@ Description
 
 The tunnel is sustained by two instances of |TS|.
 
-.. uml:: uml/TLS-Bridge-Structure.uml
+.. uml::
    :align: center
+
+   hide empty members
+
+   cloud "Cloud\nUntrusted\nNetworks" as Cloud
+   node "Ingress ATS"
+   node "Peer ATS"
+
+   [Client] <--> [Ingress ATS] : Unsecure
+   [Ingress ATS] <-> [Cloud] : Secure
+   [Cloud] <-> [Peer ATS] : Secure
+   [Peer ATS] <-u-> [Service] : Unsecure
+
+   [Ingress ATS] ..> [tls_bridge\nPlugin] : Uses
+
 
 The ingress |TS| accepts a connection from the Client. This connection gets intercepted by the
 |Name| plugin inside |TS|. The plugin then makes a TLS connection to the peer |TS| using the
@@ -90,6 +104,37 @@ Configuration
    peer argument would be "peer.example.com:4443". In ``plugin.config`` this would be::
 
       tls_bridge.so .*[.]service[.]com peer.example.com:4443
+
+Notes
+=====
+
+|Name| is distinct from more basic Layer 4 Routing available in |TS|. For the latter there is no
+intercept or change of the TLS exchange between the Client and the Service. The exchange looks like
+this
+
+.. uml::
+   :align: center
+
+   actor Client
+   participant "Ingress TS" as Ingress
+   participant Service
+
+   Client <-[#green]> Ingress : //TCP Connect//
+   Client -[#blue]-> Ingress : <font color="blue">TLS: ""CLIENT HELLO""</font>
+   note over Ingress : Map SNI to upstream Service
+   Ingress <-[#green]> Service : //TCP Connect//
+   Ingress -[#blue]-> Service : <font color="blue">TLS: ""CLIENT HELLO""</font>
+   note right : Duplicate of data from Client.
+   note over Ingress : Forward bytes between Client <&arrow-thick-left> <&arrow-thick-right> Service
+   Client <--> Service
+
+The key points are
+
+*  |TS| does no TLS negotiation at all. The properties of the connection between the Ingress |TS|
+   and the Service are completely determined by the Client and Server negotation.
+*  No packets are modified, the ""CLIENT HELLO"" sent by the Ingress |TS| is an exact copy of that
+   sent to the Ingress |TS| by the Client. It is only examined for the SNI data in order to select
+   the Service.
 
 Implementation
 ==============
