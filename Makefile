@@ -2,14 +2,15 @@
 
 .PHONY: help dirhtml singlehtml
 
-srcdir=.
-SPHINXBUILD=sphinx-build
-PAPER         = letter
-BUILDDIR      = docbuild
-JAVA          = java
+srcdir        ?= .
+SPHINXBUILD   = sphinx-build
+PAPER         ?= letter
+BUILDDIR      ?= docbuild
+JAVA          ?= java
+PLANTUML_JAR  ?= ~/bin/plantuml.jar
 
 SBUILD = $(SPHINXBUILD) ${PAPEROPT_letter}
-PLANTUML = $(JAVA) -jar ~/bin/plantuml.jar
+PLANTUML = $(JAVA) -jar $(PLANTUML_JAR)
 IMAGEDIR = $(srcdir)/pix
 BUILD_IMAGEDIR = $(BUILDDIR)/html/_images
 UMLDIR = $(srcdir)/uml
