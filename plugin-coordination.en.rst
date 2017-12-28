@@ -65,4 +65,6 @@ History
 
 At one point (Feb 2016) I had a working prototype of plugin priorities based on the YahoO! 5.3.x
 fork which assigned priorities to plugin callbacks along with an API to manipulate not just the
-current plugins priorities but that of other plugins. Although useful
+current plugins priorities but that of other plugins. Although useful, to make it work in production
+it was necessary to add plugin level enable / disable. The code for this is
+`here <https://github.com/SolidWallOfCode/trafficserver/tree/plugin-coordination>`__.

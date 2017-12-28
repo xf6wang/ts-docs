@@ -26,6 +26,7 @@ Projects
    multiplexer.en
    certifier.en
    l4r.en
+   plugin-coordination.en
 
 ======================
 Less Detailed Projects
