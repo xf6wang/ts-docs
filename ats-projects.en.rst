@@ -21,7 +21,6 @@ Projects
    testing.en
    errata.en
    body-factory.en
-   tls-bridge.en
    vconn-args.en
    multiplexer.en
    certifier.en
